@@ -1,3 +1,5 @@
+local thread = require("thread")
+
 local fractalCore = {}
 
 fractalCore.rootDir = "/fractal/"
@@ -6,6 +8,17 @@ fractalCore.userDir = fractalCore.rootDir.."user/"
 fractalCore.appsDir = fractalCore.rootDir.."apps/"       -- All users can use
 fractalCore.localAppsDir = fractalCore.userDir.."apps/"  -- Other users on the computer cannot use apps in another user's folder
 fractalCore.desktopDir = fractalCore.userDir.."desktop/"
+
+fractalCore.installPastebin = "MtcYnVyp"
+
+local keysDown = {} -- 6 keys max
+for i=0, 255 do
+  keysDown[i] = false
+end
+
+local listeners = {}
+
+local touchX, touchY = -1, -1
 
 local lowerKeys =
 {
@@ -29,10 +42,59 @@ function fractalCore.keycode(char)
 end
 
 
+local eventListenerT = thread.create(function()
+  repeat
+    -- Touch : Screen Address  , x   , y     , MouseBtn  , player
+    -- Key D : Keyboard Address, idk , key id, player
+    -- Key U : Same as Key D
+    -- Scroll: Screen Address  , x   , y     , 1/-1 (dir), player
+    -- Drag  : Screen Address  , x   , y     , MouseBtn  , player
+    -- Paste : Address?        , text, player ---- Happens for each line
 
+    -- TODO: Have this custom handeled by class requiring them
+    id, address, x, y, z, player = event.pullMultiple("key_down", "key_up", "touch", "drop", "clipboard", "scroll", "interrupt")
+    if id == "interrup" then
+      -- Soft interrupt caught and we will now shutdown
+      fractalCore.shutdown()
+    end
+    if id == "key_down" then
+      keysDown[y] = true
+    end
+    if id == "key_up" then
+      keysDown[y] = false
+    end
+    if id == "touch" then
+      touchX, touchY = x, y
+    end
+    if id == "drop" then
+      touchX, touchY = -1, -1
+    end
+  until false
+end)
 
+table.insert(listeners, eventListenerT)
 
+function fractalCore.isKeyDown(keycode)
+  return keysDown[keycode]
+end
 
+function fractalCore.isTouching()
+  return touchX == -1 and touchY == -1
+end
 
+function fractalCore.getTouchCoords()
+  return touchX, touchY
+end
+
+-- Clean up nicely
+function fractalCore.shutdown()
+
+  -- Kill all threads
+  for k, v in fractalCore.listeners do
+    v:kill()
+  end
+
+  os.exit()
+end
 
 return fractalCore

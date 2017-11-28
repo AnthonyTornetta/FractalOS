@@ -94,6 +94,6 @@ end
 
 printCentered("Installing...", line)
 
-getFileFromURL("https://pastebin.com/raw/tg6s5vep", "/test/test.lua")
+getFileFromURL("", "/test/test.lua")
 
 gpu.setResolution(oW, oH)

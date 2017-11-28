@@ -165,24 +165,6 @@ local printCentered = function(txt, height)
   end
 end
 
-local keydown = function(_, _, _, ch)
-
-end
-
-local mousedown = function(address, x, y, mouseBtn, playerName)
-
-end
-
-local mouseup = function(address, x, y, mouseBtn, playerName)
-
-end
-
-local keyListenerT = thread.create(function()
-  repeat
-    _, _, _, ch = event.pull("key_down")
-  until false
-end)
-
 local init = function()
   w, h = gpu.getResolution()
   if not fs.isDirectory(fractalCore.desktopDir) then
@@ -200,29 +182,23 @@ local init = function()
   refreshDesktop()
   drawDesktopIcons()
   drawTaskBar()
-
-  ch = nil
-  while ch ~= fractalCore.keycode("BACKSPACE") do
+  print(fractalCore.keycode("BACKSPACE"))
+  while not fractalCore.isKeyDown(fractalCore.keycode("BACKSPACE")) do
     drawInfo()
-    if ch ~= nil then
-      print(ch)
-      if ch == fractalCore.keycode("F5") then -- F5
-        os.execute("cls")
-        w, h = gpu.getResolution()
-        refreshDesktop()
-        drawTaskBar()
-      end
-
-      ch = nil
+    if fractalCore.isKeyDown(fractalCore.keycode("F5")) then -- F5
+      os.execute("cls")
+      w, h = gpu.getResolution()
+      refreshDesktop()
+      drawTaskBar()
     end
-    --event.pull("touch", mousedown)
-    --event.pull("drop", mouseup)
+
+    if fractalCore.isTouching() then
+      local x, y = fractalCore.getTouchCoords()
+      print(x, y)
+    end
 
     os.sleep(0.1)
   end
-
-  -- Kill all the running threads
-  keyListenerT:kill()
 end
 
 init()
