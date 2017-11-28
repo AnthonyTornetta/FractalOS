@@ -88,23 +88,31 @@ local function getFileFromURL(url, path)
     file:write(response)
     file:close()
   else
-    err("Could not connect to the url \""..url.."\"")
+    print("Could not connect to the url \""..url.."\"")
   end
 end
 
 printCentered("Installing...", line)
 local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/master/"
+printCentered("Installing Core Components...", 9)
+getFileFromURL(githubRoot.."core/fractalcore.lua", "/lib/fractalcore.lua")
+os.sleep(1)
 local fractalCore = require("fractalcore")
 
 fs.makeDirectory(fractalCore.rootDir)
 fs.makeDirectory(fractalCore.coreDir)
-fs.makeDirectory(fractalCore.rootDir)
-fs.makeDirectory(fractalCore.rootDir)
-fs.makeDirectory(fractalCore.userDir)
+fs.makeDirectory(fractalCore.appsDir)
+fs.makeDirectory(fractalCore.localAppsDir)
+fs.makeDirectory(fractalCore.desktopDir)
+fs.makeDirectory(fractalCore.libDir)
 fs.makeDirectory(fractalCore.userDir)
 
-getFileFromURL(githubRoot.."core/fractalcore.lua", fractalCore.libDir.."fractalcore.lua")
 getFileFromURL(githubRoot.."core/desktop.lua", fractalCore.coreDir.."desktop.lua")
 getFileFromURL(githubRoot.."core/boot.lua", fractalCore.rootDir.."boot.lua")
+
+printCentered("                                              ", 9)
+printCentered("Done!...", 9)
 gpu.setResolution(oW, oH)
+gpu.setForeground(0xFFFFFF)
+gpu.setBackground(0x000000)
 os.execute("cls")

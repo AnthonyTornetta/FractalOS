@@ -49,14 +49,15 @@ local drawDesktopIcons = function()
   gpu.setBackground(0x333333)
   gpu.setForeground(0xAAAAAA)
 
-  for k, b in pairs(desktopButtons) do
+  if #desktopButtons > 0 then
+    for k, b in pairs(desktopButtons) do
 
-    local drawX = b["x"]
-    local drawY = b["y"]
-    gpu.fill(drawX, drawY, b["width"], b["height"], " ")
-    gpu.set(b["textX"], b["textY"], b["text"])
+      local drawX = b["x"]
+      local drawY = b["y"]
+      gpu.fill(drawX, drawY, b["width"], b["height"], " ")
+      gpu.set(b["textX"], b["textY"], b["text"])
+    end
   end
-
   drawInfo()
 end
 
