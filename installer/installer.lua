@@ -94,8 +94,6 @@ end
 
 printCentered("Installing...", line)
 local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/master/"
-getFileFromURL(githubRoot.."Core/fractalcore.lua", "/lib/fractalcore.lua")
-getFileFromURL(githubRoot.."Core/desktop.lua", "/core/desktop.lua")
 local fractalCore = require("fractalcore")
 
 fs.makeDirectory(fractalCore.rootDir)
@@ -105,5 +103,8 @@ fs.makeDirectory(fractalCore.rootDir)
 fs.makeDirectory(fractalCore.userDir)
 fs.makeDirectory(fractalCore.userDir)
 
+getFileFromURL(githubRoot.."core/fractalcore.lua", fractalCore.libDir.."fractalcore.lua")
+getFileFromURL(githubRoot.."core/desktop.lua", fractalCore.coreDir.."desktop.lua")
+getFileFromURL(githubRoot.."core/boot.lua", fractalCore.rootDir.."boot.lua")
 gpu.setResolution(oW, oH)
 os.execute("cls")

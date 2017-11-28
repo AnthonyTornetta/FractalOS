@@ -3,6 +3,7 @@ local thread = require("thread")
 local fractalCore = {}
 
 fractalCore.rootDir = "/fractal/"
+fractalCore.libDir  = "/lib/"
 fractalCore.coreDir = fractalCore.rootDir.."core/"
 fractalCore.userDir = fractalCore.rootDir.."user/"
 fractalCore.appsDir = fractalCore.rootDir.."apps/"       -- All users can use
