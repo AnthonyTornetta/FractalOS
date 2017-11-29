@@ -88,7 +88,7 @@ local function getFileFromURL(url, path)
     file:write(response)
     file:close()
   else
-    print("Could not connect to the url \""..url.."\"")
+    err("Could not connect to the url \""..url.."\"")
   end
 end
 
