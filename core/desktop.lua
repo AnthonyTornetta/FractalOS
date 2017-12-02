@@ -142,7 +142,7 @@ local err = function(msg)
 end
 
 local refreshFileList = function()
-  local temp, reason = fs.list(fractalCore.desktopDir)
+  local temp, reason = fs.list(fractalCore.getDir("desktop"))
   if not temp then
     err(reason)
   end
@@ -150,7 +150,7 @@ local refreshFileList = function()
   for f in temp do
     local indexOf = string.find(f, "/")
     if indexOf ~= nil then
-      table.insert(directories, f) -- Remove the pesky '/' at the beginning
+      table.insert(directories, f)
     else
       table.insert(files, f)
     end
@@ -165,15 +165,57 @@ local printCentered = function(txt, height)
   end
 end
 
+local mouseDown = function(x, y)
+  touchX, touchY = x, y
+  print("DOWN", x, y)
+end
+
+local mouseUp = function(x, y)
+  touchX, touchY = -1, -1
+  print("UP", x, y)
+end
+
+local handleInterrupt = function()
+  --fractalCore.shutdown()
+  os.execute("cls")
+  eventListenerT:kill()
+  os.exit()
+end
+-- Event listener thread
+local eventListenerT = thread.create(function()
+  repeat
+    -- Touch : Screen Address  , x   , y     , MouseBtn  , player
+    -- Key D : Keyboard Address, idk , idk   , key id, player
+    -- Key U : Same as Key D
+    -- Scroll: Screen Address  , x   , y     , 1/-1 (dir), player
+    -- Drag  : Screen Address  , x   , y     , MouseBtn  , player
+    -- Paste : Address?        , text, player ---- Happens for each line
+
+    -- TODO: Have this custom handeled by class requiring them
+    local id, address, x, y, z, player = event.pullMultiple("interrupt", "key_down", "key_up", "touch", "drop", "clipboard", "scroll")
+    if     id == "interrupted" then
+      handleInterrupt()
+    elseif id == "key_down" then
+      fractalCore.setKeyDown(y, true)
+    elseif id == "key_up" then
+      fractalCore.setKeyDown(y, false)
+    elseif id == "touch" then
+      mouseDown(x, y)
+    elseif id == "drop" then
+      mouseUp(x, y)
+    end
+  until false
+end)
+
 local init = function()
   w, h = gpu.getResolution()
-  if not fs.isDirectory(fractalCore.desktopDir) then
-    if fs.makeDirectory(fractalCore.desktopDir) == nil then
+  if not fs.isDirectory(fractalCore.getDir("desktop")) then
+    if fs.makeDirectory(fractalCore.getDir("desktop")) == nil then
       err("Error creating desktop directory!")
       os.exit()
     end
     -- Give them a nice welcoming gift
-    local welcomeFile = fs.open(fractalCore.desktopDir.."/welcome.txt", "w")
+    local welcomeFile = fs.open(fractalCore.getDir("desktop").."/welcome.txt", "w")
     welcomeFile:write("Hello, and welcome to Fractal OS")
     welcomeFile:close()
   end
@@ -182,21 +224,15 @@ local init = function()
   refreshDesktop()
   drawDesktopIcons()
   drawTaskBar()
-  print(fractalCore.keycode("BACKSPACE"))
-  while not fractalCore.isKeyDown(fractalCore.keycode("BACKSPACE")) do
+
+  while not fractalCore.keyDown(fractalCore.keycode("BACKSPACE")) do
     drawInfo()
-    if fractalCore.isKeyDown(fractalCore.keycode("F5")) then -- F5
+    if fractalCore.keyDown(fractalCore.keycode("F5")) then -- F5
       os.execute("cls")
       w, h = gpu.getResolution()
       refreshDesktop()
       drawTaskBar()
     end
-
-    if fractalCore.isTouching() then
-      local x, y = fractalCore.getTouchCoords()
-      print(x, y)
-    end
-
     os.sleep(0.1)
   end
 end

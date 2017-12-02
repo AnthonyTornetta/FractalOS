@@ -143,7 +143,7 @@ local err = function(msg)
 end
 
 local refreshFileList = function()
-  local temp, reason = fs.list(fractalCore.desktopDir)
+  local temp, reason = fs.list(fractalCore.getDir("desktop"))
   if not temp then
     err(reason)
   end
@@ -167,14 +167,15 @@ local printCentered = function(txt, height)
 end
 
 local init = function()
+  os.execute("cls")
   w, h = gpu.getResolution()
-  if not fs.isDirectory(fractalCore.desktopDir) then
-    if fs.makeDirectory(fractalCore.desktopDir) == nil then
+  if not fs.isDirectory(fractalCore.getDir("desktop")) then
+    if fs.makeDirectory(fractalCore.getDir("desktop")) == nil then
       err("Error creating desktop directory!")
       os.exit()
     end
     -- Give them a nice welcoming gift
-    local welcomeFile = fs.open(fractalCore.desktopDir.."/welcome.txt", "w")
+    local welcomeFile = fs.open(fractalCore.getDir("desktop").."/welcome.txt", "w")
     welcomeFile:write("Hello, and welcome to Fractal OS")
     welcomeFile:close()
   end
@@ -183,7 +184,6 @@ local init = function()
   refreshDesktop()
   drawDesktopIcons()
   drawTaskBar()
-  print(fractalCore.keycode("BACKSPACE"))
   while not fractalCore.isKeyDown(fractalCore.keycode("BACKSPACE")) do
     drawInfo()
     if fractalCore.isKeyDown(fractalCore.keycode("F5")) then -- F5
@@ -197,6 +197,9 @@ local init = function()
       local x, y = fractalCore.getTouchCoords()
       print(x, y)
     end
+
+    local x, y = fractalCore.getTouchCoords()
+    print(x, y)
 
     os.sleep(0.1)
   end

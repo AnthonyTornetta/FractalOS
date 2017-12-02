@@ -1,29 +1,33 @@
 local thread = require("thread")
+local computer = require("computer")
 
 local fractalCore = {}
 
-fractalCore.rootDir = "/fractal/"
-fractalCore.libDir  = "/lib/"
-fractalCore.coreDir = fractalCore.rootDir.."core/"
-fractalCore.userDir = fractalCore.rootDir.."user/"
-fractalCore.appsDir = fractalCore.rootDir.."apps/"       -- All users can use
-fractalCore.localAppsDir = fractalCore.userDir.."apps/"  -- Other users on the computer cannot use apps in another user's folder
-fractalCore.desktopDir = fractalCore.userDir.."desktop/"
+local dirs = {}
 
-fractalCore.installPastebin = "MtcYnVyp"
+function fractalCore.getDir(dirName)
+  return dirs[string.lower(dirName)]
+end
+function fractalCore.getInstallPastebin()
+  return "MtcYnVyp"
+end
 
-local keysDown = {} -- 6 keys max
+local keysDown = {}
 for i=0, 255 do
   keysDown[i] = false
 end
 
-local listeners = {}
+function fractalCore.setKeyDown(keyCode, down)
+  keysDown[keyCode] = down
+end
 
-local touchX, touchY = -1, -1
+function fractalCore.keyDown(keyCode)
+  return keysDown[keyCode]
+end
 
 local lowerKeys =
 {
-  ["F1"] = 59, ["F2"] = 60, ["F3"] = 61, ["F5"] = 62, ["F6"] = 63,
+  ["F1"] = 59, ["F2"] = 60, ["F3"] = 61, ["F4"] = 62, ["F5"] = 63, ["F6"] = 64,
   ["`"] = 41, ["-"] = 12, ["="] = 13, ["BACKSPACE"] = 14,
   ["TAB"] = 15, ["Q"] = 16, ["W"] = 17, ["E"] = 18, ["R"] = 19, ["T"] = 20, ["Y"] = 21, ["U"] = 22, ["I"] = 23, ["O"] = 24, ["P"] = 25, ["["] = 26, ["]"] = 27, ["\\"] = 43,
   ["A"] = 30, ["S"] = 31, ["D"] = 32, ["F"] = 33, ["G"] = 34, ["H"] = 35, ["J"] = 36, ["K"] = 37, ["L"] = 38, [";"] = 39, ["'"] = 40, ["RETURN"] = 28,
@@ -42,60 +46,22 @@ function fractalCore.keycode(char)
   return lowerKeys[string.upper(char)]
 end
 
-
-local eventListenerT = thread.create(function()
-  repeat
-    -- Touch : Screen Address  , x   , y     , MouseBtn  , player
-    -- Key D : Keyboard Address, idk , key id, player
-    -- Key U : Same as Key D
-    -- Scroll: Screen Address  , x   , y     , 1/-1 (dir), player
-    -- Drag  : Screen Address  , x   , y     , MouseBtn  , player
-    -- Paste : Address?        , text, player ---- Happens for each line
-
-    -- TODO: Have this custom handeled by class requiring them
-    id, address, x, y, z, player = event.pullMultiple("key_down", "key_up", "touch", "drop", "clipboard", "scroll", "interrupt")
-    if id == "interrup" then
-      -- Soft interrupt caught and we will now shutdown
-      fractalCore.shutdown()
-    end
-    if id == "key_down" then
-      keysDown[y] = true
-    end
-    if id == "key_up" then
-      keysDown[y] = false
-    end
-    if id == "touch" then
-      touchX, touchY = x, y
-    end
-    if id == "drop" then
-      touchX, touchY = -1, -1
-    end
-  until false
-end)
-
-table.insert(listeners, eventListenerT)
-
-function fractalCore.isKeyDown(keycode)
-  return keysDown[keycode]
-end
-
-function fractalCore.isTouching()
-  return touchX == -1 and touchY == -1
-end
-
-function fractalCore.getTouchCoords()
-  return touchX, touchY
-end
-
 -- Clean up nicely
 function fractalCore.shutdown()
-
-  -- Kill all threads
-  for k, v in fractalCore.listeners do
-    v:kill()
-  end
-
-  os.exit()
+  computer.shutdown(false) -- Shutdown, not restart
 end
+
+
+local initVals = function()
+  dirs["root"]      = "/fractal/"
+  dirs["lib"]       = "/lib/"
+  dirs["core"]      = fractalCore.getDir("root").."core/"
+  dirs["user"]      = fractalCore.getDir("root").."user/"
+  dirs["apps"]      = fractalCore.getDir("root").."apps/"
+  dirs["localapps"] = fractalCore.getDir("user").."apps/"
+  dirs["desktop"]   = fractalCore.getDir("user").."desktop/"
+end
+
+initVals()
 
 return fractalCore
