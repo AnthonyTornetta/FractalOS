@@ -1,4 +1,4 @@
-local fractalCore = require("fractalCore")
+local fractalCore = require("fractalcore")
 local fs = require("filesystem")
 
 print("Booting Fractal OS...")
