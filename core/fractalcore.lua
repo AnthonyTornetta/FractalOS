@@ -62,6 +62,15 @@ local initVals = function()
   dirs["desktop"]   = fractalCore.getDir("user").."desktop/"
 end
 
+-- Util Functions
+function fractalCore.tableLength(table)
+  local count = 0
+  for _ in pairs(table) do
+    count = count + 1
+  end
+  return count
+end
+
 initVals()
 
 return fractalCore
