@@ -1,5 +1,6 @@
 local thread = require("thread")
 local computer = require("computer")
+local fs = require("filesystem")
 
 local fractalCore = {}
 
@@ -52,7 +53,7 @@ function fractalCore.shutdown()
 end
 
 
-local initVals = function()
+local function initVals()
   dirs["root"]      = "/fractal/"
   dirs["lib"]       = "/lib/"
   dirs["core"]      = fractalCore.getDir("root").."core/"
@@ -60,6 +61,24 @@ local initVals = function()
   dirs["apps"]      = fractalCore.getDir("root").."apps/"
   dirs["localapps"] = fractalCore.getDir("user").."apps/"
   dirs["desktop"]   = fractalCore.getDir("user").."desktop/"
+end
+
+-- File Utils
+
+-- Gets the file extension of any file
+function fractalCore.getFileExtension(fileName)
+  if(fs.isDirectory(fileName)) then
+    return "/"
+  end
+
+  local subVal = 1
+  while string.sub(fileName, #fileName - subVal, #fileName - subVal) ~= "." and #fileName - subVal > 0 do
+    subVal = subVal + 1
+  end
+  if #fileName - subVal <= 0 then
+    return ""
+  end
+  return string.sub(fileName, #fileName - subVal + 1, #fileName) -- + 1 to remove the '.' at the beginning
 end
 
 -- Util Functions

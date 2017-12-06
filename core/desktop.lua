@@ -21,8 +21,7 @@ local sidePadding = 4
 local topPadding  = 6
 
 -- TASKBAR --
-local taskbarHeight = 2
-local startWidth, startHeight = 4, 2
+local startButtonWidth, taskbarHeight = 8, 4
 
 -- For easy storage of the files/directories in the desktop directory
 local files = {}
@@ -135,7 +134,7 @@ local drawTaskBar = function()
   gpu.fill(1, h - (taskbarHeight - 1), w, taskbarHeight, " ")
 
   gpu.setBackground(0x555555)
-  gpu.fill(1, h - (startHeight - 1), startWidth, startHeight, " ")
+  gpu.fill(1, h - (taskbarHeight - 1), startButtonWidth, taskbarHeight, " ")
 end
 
 local err = function(msg)
@@ -168,7 +167,7 @@ end
 
 local mouseDown = function(x, y, mouseBtn, player)
   touchX, touchY = x, y
-  
+
 end
 
 local mouseUp = function(x, y, mouseBtn, player)
