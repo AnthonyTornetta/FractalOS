@@ -8,7 +8,8 @@ local key = require("keyboard")
 local event = require("event")
 local term = require("term")
 
-local gpu = comp.gpu;
+local gpu = comp.gpu
+local running = true
 
 -- DESKTOP --
 w, h = gpu.getResolution()
@@ -165,21 +166,18 @@ local printCentered = function(txt, height)
   end
 end
 
-local mouseDown = function(x, y)
+local mouseDown = function(x, y, mouseBtn, player)
   touchX, touchY = x, y
-  print("DOWN", x, y)
+  
 end
 
-local mouseUp = function(x, y)
+local mouseUp = function(x, y, mouseBtn, player)
   touchX, touchY = -1, -1
-  print("UP", x, y)
+
 end
 
 local handleInterrupt = function()
-  --fractalCore.shutdown()
-  os.execute("cls")
-  eventListenerT:kill()
-  os.exit()
+  running = false
 end
 -- Event listener thread
 local eventListenerT = thread.create(function()
@@ -200,9 +198,9 @@ local eventListenerT = thread.create(function()
     elseif id == "key_up" then
       fractalCore.setKeyDown(y, false)
     elseif id == "touch" then
-      mouseDown(x, y)
+      mouseDown(x, y, z, player)
     elseif id == "drop" then
-      mouseUp(x, y)
+      mouseUp(x, y, z, player)
     end
   until false
 end)
@@ -225,9 +223,9 @@ local init = function()
   drawDesktopIcons()
   drawTaskBar()
 
-  while not fractalCore.keyDown(fractalCore.keycode("BACKSPACE")) do
+  while running do
     drawInfo()
-    if fractalCore.keyDown(fractalCore.keycode("F5")) then -- F5
+    if fractalCore.keyDown(fractalCore.keycode("F5")) then
       os.execute("cls")
       w, h = gpu.getResolution()
       refreshDesktop()
@@ -235,6 +233,10 @@ local init = function()
     end
     os.sleep(0.1)
   end
+  gpu.setForeground(0xFFFFFF)
+  gpu.setBackground(0x000000)
+  os.execute("cls")
+  os.exit()
 end
 
 init()

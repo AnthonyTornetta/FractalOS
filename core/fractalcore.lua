@@ -71,6 +71,10 @@ function fractalCore.tableLength(table)
   return count
 end
 
+function fractalCore.stringLength(str)
+  return #str
+end
+
 initVals()
 
 return fractalCore
