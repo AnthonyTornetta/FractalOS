@@ -2,7 +2,7 @@ local comp = require("component")
 local gpu = comp.gpu
 
 local api = {}
-local buttons = {}
+buttons = {}
 
 function api.clearButtons()
   buttons = {}
@@ -15,8 +15,7 @@ function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
   buttons[id]["y"] = y
   buttons[id]["text"] = text
   buttons[id]["bgcol"] = bgcolor
-  buttons[id]["fgcol"] = bgcolor
-  print(buttons[id]["bgcol"], buttons[id]["fgcol"])
+  buttons[id]["fgcol"] = fgcolor
   buttons[id]["width"]  = width
   buttons[id]["height"] = height
   buttons[id]["text-align"] = "left"
@@ -30,7 +29,7 @@ function api.getButtonDimentions(id)
   return buttons[id]["width"], buttons[id]["height"]
 end
 
-function api.setTextAlignment(id, alignment)
+function api.setAlignment(id, alignment)
   buttons[id]["text-align"] = centered
 end
 
@@ -51,9 +50,7 @@ function api.getColors(id)
 end
 
 function api.draw(id)
-  local b = buttons[id]["bgcol"]
-  local f = buttons[id]["fgcol"]
-  local bgCol, fgCol = api.getColors()
+  local bgCol, fgCol = 0xFFFFFF, 0x000000--api.getColors()
 
   gpu.setBackground(bgCol)
   gpu.setForeground(fgCol)
@@ -73,10 +70,10 @@ function api.draw(id)
     drawY = y + height / 2 - 1
   else
     drawX = x + (width / 2) - (#buttons[id]["text"] / 2)
-    drawY = y + height / 2 - 1
+    drawY = y + math.floor(height / 2)
   end
 
-  gpu.set(drawX, drawY, b["text"])
+  gpu.set(drawX, drawY, buttons[id]["text"])
 end
 
 function api.within(x, y)
