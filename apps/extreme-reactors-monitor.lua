@@ -178,6 +178,11 @@ function run()
     gpu.fill(2, height + 3, percentFuelFilled, height, " ")
 
     bApi.drawAll()
+    gpu.setForeground(0xFFFFFF)
+
+    gpu.setBackground(0x4863A0)
+    gpu.set(btnDrawX + btnWidth + btnPaddingX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY + math.floor(btnHeight / 2), minPercent.."%")
+
 
     if percentFilled >= maxPercent then
       reactorOff()

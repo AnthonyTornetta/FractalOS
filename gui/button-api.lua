@@ -3,10 +3,14 @@ local gpu = comp.gpu
 
 local api = {}
 buttons = {}
+textBoxes = {}
 
 function api.clearButtons()
   buttons = {}
-  api.clear()
+end
+
+function api.clearTextBoxes()
+  textBoxes = {}
 end
 
 function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
@@ -19,6 +23,18 @@ function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
   buttons[id]["width"]  = width
   buttons[id]["height"] = height
   buttons[id]["text-align"] = "center"
+end
+
+function api.setTextBox(id, x, y, width, height, bgcolor, fgcolor, text)
+  textBoxes[id] = {}
+  textBoxes[id]["x"] = x
+  textBoxes[id]["y"] = y
+  textBoxes[id]["text"] = text
+  textBoxes[id]["bgcol"] = bgcolor
+  textBoxes[id]["fgcol"] = fgcolor
+  textBoxes[id]["width"]  = width
+  textBoxes[id]["height"] = height
+  textBoxes[id]["text-align"] = "center"
 end
 
 function api.getButtonPosition(id)
@@ -50,7 +66,7 @@ function api.getColors(id)
 end
 
 function api.draw(id)
-  local bgCol, fgCol = 0xFFFFFF, 0x000000--api.getColors()
+  local bgCol, fgCol = api.getColors()
 
   gpu.setBackground(bgCol)
   gpu.setForeground(fgCol)
