@@ -62,11 +62,11 @@ function api.getForegroundColor(id)
 end
 
 function api.getColors(id)
-  return api.getBackgroundColor(id), api.getForegroundColor(id)
+  return buttons[id]["bgcol"], buttons[id]["fgcol"]
 end
 
 function api.draw(id)
-  local bgCol, fgCol = api.getColors()
+  local bgCol, fgCol = api.getColors(id)
 
   gpu.setBackground(bgCol)
   gpu.setForeground(fgCol)

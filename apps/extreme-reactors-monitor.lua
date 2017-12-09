@@ -8,13 +8,16 @@ local serialization = require("serialization")
 local gpu = comp.gpu
 local reactor = comp.br_reactor
 
-local minPercent = 0
-local maxPercent = 0
-
 local configFile = "/fractal/apps/settings/reactor-monitor.cfg"
 local config = {}
 
 local running = true
+
+local btnSubMinID = "btn-sub-min"
+local btnAddMinID = "btn-add-min"
+local btnSubMaxID = "btn-sub-max"
+local btnAddMaxID = "btn-add-max"
+
 
 --[[
      If this is on 'monitor', the code does the on/off thing for you
@@ -54,6 +57,19 @@ function getMaxEnergy()
   return 10000000
 end
 
+function setMinPercent(x)
+  config.percentages.minPercent = x
+end
+function setMaxPercent(x)
+  config.percentages.maxPercent = x
+end
+function getMinPercent()
+  return config.percentages.minPercent
+end
+function getMaxPercent()
+  return config.percentages.maxPercent
+end
+
 function drawBox(x, y, width, height)
   gpu.fill(x, y, width, 1, " ")
   gpu.fill(x, y, 1, height, " ")
@@ -81,17 +97,12 @@ local readConfig = function()
   for k,v in pairs(c) do
     config[k] = v
   end
-
-
-  minPercent = config.percentages.minPercent
-  maxPercent = config.percentages.maxPercent
-
   return true
 end
 
 local createConfig = function()
-  config.percentages.minPercent = 5
-  config.percentages.maxPercent = 95
+  setMinPercent(5)
+  setMaxPercent(95)
 
   fs.makeDirectory("/fractal/apps/settings")
   saveConfig()
@@ -101,14 +112,31 @@ function handleInterrupt()
   running = false
 end
 
-function mouseDown(x, y)
-  print("Randeded")
-  local btnId = bApi.within(x, y)
-  print("Randood")
-  if btnId ~= -1 then
-    if btnId == "btn-add" then
+function clamp(var, min, max)
+  if var < min then
+    var = min
+  end
+  if var > max then
+    var = max
+  end
+  return var
+end
 
+function mouseDown(x, y)
+  local btnId = bApi.within(x, y)
+  if btnId ~= -1 then
+    if btnId == btnSubMinID then
+      setMinPercent(getMinPercent() - 1)
+    elseif btnId == btnAddMinID then
+      setMinPercent(getMinPercent() + 1)
+    elseif btnId == btnSubMaxID then
+      setMaxPercent(getMaxPercent() - 1)
+    elseif btnId == btnAddMaxID then
+      setMaxPercent(getMaxPercent() + 1)
     end
+
+    setMinPercent(clamp(getMinPercent(), 0, getMaxPercent() - 1))
+    setMaxPercent(clamp(getMaxPercent(), getMinPercent() + 1, 100))
   end
 end
 
@@ -137,11 +165,11 @@ function run()
   local btnDrawY = 2
   local btnWidth = 9
   local btnHeight = 3
-  bApi.setButton("btn-sub-min", btnDrawX                         , btnDrawY + btnPaddingY, btnWidth, btnHeight, 0x4433DD, 0xFFFFFF, "-")
-  bApi.setButton("btn-add-min", btnDrawX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY, btnWidth, btnHeight, 0x4433DD, 0xFFFFFF, "+")
+  bApi.setButton(btnSubMinID, btnDrawX                         , btnDrawY + btnPaddingY, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
+  bApi.setButton(btnAddMinID, btnDrawX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
 
-  bApi.setButton("btn-sub-max", btnDrawX                         , btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4433DD, 0xFFFFFF, "-")
-  bApi.setButton("btn-add-max", btnDrawX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4433DD, 0xFFFFFF, "+")
+  bApi.setButton(btnSubMaxID, btnDrawX                         , btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
+  bApi.setButton(btnAddMaxID, btnDrawX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
 
   drawBox(1, 1, width + 1, height + 1)
 
@@ -180,15 +208,25 @@ function run()
     bApi.drawAll()
     gpu.setForeground(0xFFFFFF)
 
+    drawX = btnDrawX + btnWidth + btnPaddingX + btnWidth + btnPaddingX
+    drawY = btnDrawY + btnPaddingY + math.floor(btnHeight / 2)
+
+    gpu.setBackground(0x000000)
+    gpu.set(drawX, drawY, "              ")
     gpu.setBackground(0x4863A0)
-    gpu.set(btnDrawX + btnWidth + btnPaddingX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY + math.floor(btnHeight / 2), minPercent.."%")
+    gpu.set(drawX, drawY, getMinPercent().."%".." Min")
 
+    drawY = drawY + math.floor(btnHeight / 2) + btnHeight
+    gpu.setBackground(0x000000)
+    gpu.set(drawX, drawY, "              ")
+    gpu.setBackground(0x4863A0)
+    gpu.set(drawX, drawY, getMaxPercent().."%".." Max")
 
-    if percentFilled >= maxPercent then
+    if percentFilled >= getMaxPercent() then
       reactorOff()
     end
 
-    if percentFilled <= minPercent then
+    if percentFilled <= getMinPercent() then
       reactorOn()
     end
     os.sleep(0.1)
