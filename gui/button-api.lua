@@ -18,7 +18,7 @@ function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
   buttons[id]["fgcol"] = fgcolor
   buttons[id]["width"]  = width
   buttons[id]["height"] = height
-  buttons[id]["text-align"] = "left"
+  buttons[id]["text-align"] = "center"
 end
 
 function api.getButtonPosition(id)
@@ -74,6 +74,12 @@ function api.draw(id)
   end
 
   gpu.set(drawX, drawY, buttons[id]["text"])
+end
+
+function api.drawAll()
+  for k, v in pairs(buttons) do
+    api.draw(k)
+  end
 end
 
 function api.within(x, y)
