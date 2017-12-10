@@ -13,19 +13,24 @@ local config = {}
 
 local running = true
 
+-- Buttons
 local btnSubMinID = "btn-sub-min"
 local btnAddMinID = "btn-add-min"
 local btnSubMaxID = "btn-sub-max"
 local btnAddMaxID = "btn-add-max"
+local btnReactorControlID = "btn-reactor-control"
+
+-- Text boxes
+local txtReactorStatusID = "txt-reactor-status"
 
 
 --[[
-     If this is on 'monitor', the code does the on/off thing for you
+     If this is on 'automatic', the code does the on/off thing for you
      If this is on 'off', the reactor is off and won't change unless user inputs an on signal
      If this is on 'on', the reactor is on and won't change unless user inputs an off signal
   ]]
-local reactorState = "monitor" -- monitor, on, off
-
+local reactorState = "automatic" -- automatic, on, off
+local reactorStatus = "OFF"
 
 
 if not reactor.getMultiblockAssembled() then
@@ -145,6 +150,12 @@ function run()
     createConfig()
   end
 
+  if reactor.isRunning() then
+    reactorStatus = "ON"
+  else
+    reactorStatus = "OFF"
+  end
+
   currentRf = reactor.getEnergyStored()
   maxFuel = reactor.getFuelAmountMax()
 
@@ -171,8 +182,12 @@ function run()
   bApi.setButton(btnSubMaxID, btnDrawX                         , btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
   bApi.setButton(btnAddMaxID, btnDrawX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
 
-  drawBox(1, 1, width + 1, height + 1)
+  btnDrawY = btnDrawY + btnPaddingY * 3 + btnHeight * 2
+  bApi.setButton(btnReactorControlID, btnDrawX, btnDrawY, btnWidth * 2, btnHeight, 0xAAAAAA, 0xFFFFFF, "Automatic")
+  bApi.setTextBox(txtReactorStatusID, btnDrawX +  + btnWidth * 2 + btnPaddingX, btnDrawY + math.floor(btnHeight / 2), 0xAAAAAA, 0xFFFFFF, "Reactor Status: "..reactorStatus)
 
+  
+  drawBox(1, 1, width + 1, height + 1)
   drawBox(1, height + 2, width + 1, height + 1)
 
   -- Event listener thread
