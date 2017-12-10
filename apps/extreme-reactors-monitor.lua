@@ -63,6 +63,12 @@ function getMaxEnergy()
   return 10000000
 end
 
+function getMinPercent()
+  return config.percentages.minPercent
+end
+function getMaxPercent()
+  return config.percentages.maxPercent
+end
 function setMinPercent(x)
   config.percentages.minPercent = x
   wApi.setTextBoxText(txtMinID, tostring(getMinPercent()).."%")
@@ -70,12 +76,6 @@ end
 function setMaxPercent(x)
   config.percentages.maxPercent = x
   wApi.setTextBoxText(txtMaxID, tostring(getMaxPercent()).."%")
-end
-function getMinPercent()
-  return config.percentages.minPercent
-end
-function getMaxPercent()
-  return config.percentages.maxPercent
 end
 
 function drawBox(x, y, width, height)
