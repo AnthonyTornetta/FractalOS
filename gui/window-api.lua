@@ -14,6 +14,14 @@ function api.clearTextBoxes()
 end
 
 function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
+  assert(type(x) == "number", "x must be number")
+  assert(type(y) == "number", "y must be number")
+  assert(type(width) == "number", "width must be number")
+  assert(type(height) == "number", "height must be number")
+  assert(type(bgcolor) == "number", "Background Color must be color")
+  assert(type(fgcolor) == "number", "Foreground Color must be color")
+  assert(type(text) == "string", "text must be string")
+
   buttons[id] = {}
   buttons[id]["x"] = x
   buttons[id]["y"] = y
@@ -34,6 +42,7 @@ function api.getButtonDimentions(id)
 end
 
 function api.setButtonAlignment(id, alignment)
+  assert(type(alignment) == "string", "alignment must be string")
   buttons[id]["text-align"] = centered
 end
 
@@ -51,6 +60,16 @@ end
 
 function api.getButtonColors(id)
   return buttons[id]["bgcol"], buttons[id]["fgcol"]
+end
+
+function api.setButtonBackground(id, c)
+  assert(type(c) == "number", "color must be number")
+  buttons[id]["bgcol"] = c
+end
+
+function api.setButtonForeground(id, c)
+  assert(type(c) == "number", "color must be number")
+  buttons[id]["fgcol"] = c
 end
 
 function api.drawButton(id)
@@ -87,6 +106,9 @@ function api.drawAllButtons()
 end
 
 function api.withinButtons(x, y)
+  assert(type(x) == "number", "x must be number")
+  assert(type(y) == "number", "y must be number")
+
   for id, _ in pairs(buttons) do
     local btnX, btnY = api.getButtonPosition(id)
     local width, height = api.getButtonDimentions(id)
@@ -100,6 +122,14 @@ function api.withinButtons(x, y)
 end
 
 function api.setTextBox(id, x, y, width, height, bgcolor, fgcolor, text)
+  assert(type(x) == "number", "x must be number")
+  assert(type(y) == "number", "y must be number")
+  assert(type(width) == "number", "width must be number")
+  assert(type(height) == "number", "height must be number")
+  assert(type(bgcolor) == "number", "Background Color must be color")
+  assert(type(fgcolor) == "number", "Foreground Color must be color")
+  assert(type(text) == "string", "text must be string")
+
   textBoxes[id] = {}
   textBoxes[id]["x"] = x
   textBoxes[id]["y"] = y
@@ -116,6 +146,7 @@ function api.getTextBoxText(id)
 end
 
 function api.setTextBoxText(id, text)
+  assert(type(text) == "string", "text must be string")
   textBoxes[id]["text"] = text
 end
 
@@ -124,6 +155,8 @@ function api.getTextBoxDimensions(id)
 end
 
 function api.setTextBoxDimensions(id, w, h)
+  assert(type(w) == "number", "width must be number")
+  assert(type(h) == "number", "height must be number")
   if w ~= nil then
     textBoxes[id]["width"] = w
   end
@@ -141,6 +174,7 @@ function api.getTextBoxColors(id)
 end
 
 function api.setTextBoxAlignment(id, alignment)
+  assert(type(alignment) == "string", "alignment must be number")
   textBoxes[id]["alignment"] = alignment
 end
 

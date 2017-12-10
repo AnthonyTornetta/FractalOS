@@ -1,7 +1,7 @@
 local comp = require("component")
 local thread = require("thread")
 local fs = require("filesystem")
-local bApi = require("button-api")
+local bApi = require("window-api")
 local event = require("event")
 local serialization = require("serialization")
 
@@ -128,7 +128,7 @@ function clamp(var, min, max)
 end
 
 function mouseDown(x, y)
-  local btnId = bApi.within(x, y)
+  local btnId = bApi.withinButtons(x, y)
   if btnId ~= -1 then
     if btnId == btnSubMinID then
       setMinPercent(getMinPercent() - 1)
@@ -138,6 +138,20 @@ function mouseDown(x, y)
       setMaxPercent(getMaxPercent() - 1)
     elseif btnId == btnAddMaxID then
       setMaxPercent(getMaxPercent() + 1)
+    elseif btnId == btnReactorControlID then
+      if reactorState == "automatic" then
+        reactorState = "on"
+        bApi.setButtonText(btnId, "On")
+        bApi.setButtonBackground(btnId, 0x00FF00)
+      elseif reactorState == "on" then
+        reactorState = "off"
+        bApi.setButtonText(btnId, "Off")
+        bApi.setButtonBackground(btnId, 0xFF0000)
+      elseif reactorState == "off" then
+        reactorState = "automatic"
+        bApi.setButtonText(btnId, "Automatic")
+        bApi.setButtonBackground(btnId, 0xAAAAAA)
+      end
     end
 
     setMinPercent(clamp(getMinPercent(), 0, getMaxPercent() - 1))
@@ -150,7 +164,7 @@ function run()
     createConfig()
   end
 
-  if reactor.isRunning() then
+  if reactor.getActive() then
     reactorStatus = "ON"
   else
     reactorStatus = "OFF"
@@ -184,13 +198,15 @@ function run()
 
   btnDrawY = btnDrawY + btnPaddingY * 3 + btnHeight * 2
   bApi.setButton(btnReactorControlID, btnDrawX, btnDrawY, btnWidth * 2, btnHeight, 0xAAAAAA, 0xFFFFFF, "Automatic")
-  bApi.setTextBox(txtReactorStatusID, btnDrawX +  + btnWidth * 2 + btnPaddingX, btnDrawY + math.floor(btnHeight / 2), 0xAAAAAA, 0xFFFFFF, "Reactor Status: "..reactorStatus)
 
-  
+  --              id                , x                                    ,                                    y, width, height, bgcolor , fgcolor , text
+  bApi.setTextBox(txtReactorStatusID, btnDrawX + btnWidth * 2 + btnPaddingX, btnDrawY + math.floor(btnHeight / 2), 5    , 3     , 0xAAAAAA, 0xFFFFFF, "Reactor Status: OFF")
+
+  -- txtReactorStatusID, btnDrawX + btnWidth + btnWidth * 2 + btnPaddingX, btnDrawY + math.floor(btnHeight / 2), 0xAAAAAA, 0xFFFFFF, "Reactor Status: "..reactorStatus
   drawBox(1, 1, width + 1, height + 1)
   drawBox(1, height + 2, width + 1, height + 1)
 
-  -- Event listener thread
+  --[[ Event listener thread
   local eventListenerT = thread.create(function()
     repeat
       local id, _, x, y = event.pullMultiple("touch", "interrupted")
@@ -201,9 +217,16 @@ function run()
       end
 
     until false
-  end)
+  end)]]
 
   while running do
+    local id, _, x, y = event.pullMultiple("touch", "interrupted")
+    if id == "interrupted" then
+      handleInterrupt()
+    elseif id == "touch" then
+      mouseDown(x, y)
+    end
+
     local RFProduced = reactor.getEnergyStored() - currentRf
     currentRF = reactor.getEnergyStored()
     currentFuel = reactor.getFuelAmount()
@@ -244,6 +267,14 @@ function run()
     if percentFilled <= getMinPercent() then
       reactorOn()
     end
+
+
+    if reactor.getActive() then
+      reactorStatus = "On"
+    else
+      reactorStatus = "Off"
+    end
+
     os.sleep(0.1)
   end
 
