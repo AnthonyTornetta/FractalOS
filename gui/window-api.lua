@@ -72,6 +72,11 @@ function api.setButtonForeground(id, c)
   buttons[id]["fgcol"] = c
 end
 
+function api.setButtonText(id, text)
+  assert(type(text) == "string", "text must be string")
+  buttons[id]["text"] = text
+end
+
 function api.drawButton(id)
   local bgCol, fgCol = api.getButtonColors(id)
 

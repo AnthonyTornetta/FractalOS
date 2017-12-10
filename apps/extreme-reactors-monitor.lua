@@ -1,12 +1,12 @@
+local serialization = require("serialization")
+local wApi = require("window-api")
 local comp = require("component")
 local thread = require("thread")
 local fs = require("filesystem")
-local bApi = require("window-api")
 local event = require("event")
-local serialization = require("serialization")
 
-local gpu = comp.gpu
 local reactor = comp.br_reactor
+local gpu = comp.gpu
 
 local configFile = "/fractal/apps/settings/reactor-monitor.cfg"
 local config = {}
@@ -21,7 +21,8 @@ local btnAddMaxID = "btn-add-max"
 local btnReactorControlID = "btn-reactor-control"
 
 -- Text boxes
-local txtReactorStatusID = "txt-reactor-status"
+local txtMinID = "txt-min"
+local txtMaxID = "txt-max"
 
 
 --[[
@@ -64,9 +65,11 @@ end
 
 function setMinPercent(x)
   config.percentages.minPercent = x
+  wApi.setTextBoxText(txtMinID, tostring(getMinPercent()).."%")
 end
 function setMaxPercent(x)
   config.percentages.maxPercent = x
+  wApi.setTextBoxText(txtMaxID, tostring(getMaxPercent()).."%")
 end
 function getMinPercent()
   return config.percentages.minPercent
@@ -128,34 +131,29 @@ function clamp(var, min, max)
 end
 
 function mouseDown(x, y)
-  local btnId = bApi.withinButtons(x, y)
+  local btnId = wApi.withinButtons(x, y)
   if btnId ~= -1 then
     if btnId == btnSubMinID then
       setMinPercent(getMinPercent() - 1)
+      setMinPercent(clamp(getMinPercent(), 0, getMaxPercent() - 1))
     elseif btnId == btnAddMinID then
       setMinPercent(getMinPercent() + 1)
+      setMinPercent(clamp(getMinPercent(), 0, getMaxPercent() - 1))
     elseif btnId == btnSubMaxID then
       setMaxPercent(getMaxPercent() - 1)
+      setMaxPercent(clamp(getMaxPercent(), getMinPercent() + 1, 100))
     elseif btnId == btnAddMaxID then
       setMaxPercent(getMaxPercent() + 1)
+      setMaxPercent(clamp(getMaxPercent(), getMinPercent() + 1, 100))
     elseif btnId == btnReactorControlID then
       if reactorState == "automatic" then
         reactorState = "on"
-        bApi.setButtonText(btnId, "On")
-        bApi.setButtonBackground(btnId, 0x00FF00)
       elseif reactorState == "on" then
         reactorState = "off"
-        bApi.setButtonText(btnId, "Off")
-        bApi.setButtonBackground(btnId, 0xFF0000)
-      elseif reactorState == "off" then
+      else
         reactorState = "automatic"
-        bApi.setButtonText(btnId, "Automatic")
-        bApi.setButtonBackground(btnId, 0xAAAAAA)
       end
     end
-
-    setMinPercent(clamp(getMinPercent(), 0, getMaxPercent() - 1))
-    setMaxPercent(clamp(getMaxPercent(), getMinPercent() + 1, 100))
   end
 end
 
@@ -186,27 +184,33 @@ function run()
 
   local btnPaddingX = 6
   local btnPaddingY = 1
-  local btnDrawX = width + btnPaddingX
-  local btnDrawY = 2
   local btnWidth = 9
   local btnHeight = 3
-  bApi.setButton(btnSubMinID, btnDrawX                         , btnDrawY + btnPaddingY, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
-  bApi.setButton(btnAddMinID, btnDrawX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
+  local btnDrawX = width + btnPaddingX
+  local btnDrawXRight = btnDrawX + btnWidth + btnPaddingX
+  local btnDrawTxtBox = btnDrawXRight + btnWidth + btnPaddingX
+  local btnDrawY = 2 + btnPaddingY
+  local txtWidth = 9
+  local txtHeight = 1
 
-  bApi.setButton(btnSubMaxID, btnDrawX                         , btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
-  bApi.setButton(btnAddMaxID, btnDrawX + btnWidth + btnPaddingX, btnDrawY + btnPaddingY * 2 + btnHeight, btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
+  wApi.setButton (btnSubMinID, btnDrawX     , btnDrawY    , btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
+  wApi.setButton (btnAddMinID, btnDrawXRight, btnDrawY    , btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
+  wApi.setTextBox(txtMinID   , btnDrawTxtBox, btnDrawY + 1, txtWidth, txtHeight, 0x4863A0, 0xFFFFFF, tostring(getMinPercent()).."%")
 
-  btnDrawY = btnDrawY + btnPaddingY * 3 + btnHeight * 2
-  bApi.setButton(btnReactorControlID, btnDrawX, btnDrawY, btnWidth * 2, btnHeight, 0xAAAAAA, 0xFFFFFF, "Automatic")
+  btnDrawY = btnDrawY + btnPaddingY * 2 + btnHeight
 
-  --              id                , x                                    ,                                    y, width, height, bgcolor , fgcolor , text
-  bApi.setTextBox(txtReactorStatusID, btnDrawX + btnWidth * 2 + btnPaddingX, btnDrawY + math.floor(btnHeight / 2), 5    , 3     , 0xAAAAAA, 0xFFFFFF, "Reactor Status: OFF")
+  wApi.setButton (btnSubMaxID, btnDrawX     , btnDrawY    , btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
+  wApi.setButton (btnAddMaxID, btnDrawXRight, btnDrawY    , btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
+  wApi.setTextBox(txtMaxID   , btnDrawTxtBox, btnDrawY + 1, txtWidth, txtHeight, 0x4863A0, 0xFFFFFF, tostring(getMaxPercent()).."%")
 
-  -- txtReactorStatusID, btnDrawX + btnWidth + btnWidth * 2 + btnPaddingX, btnDrawY + math.floor(btnHeight / 2), 0xAAAAAA, 0xFFFFFF, "Reactor Status: "..reactorStatus
+  btnDrawY = btnDrawY + btnPaddingY * 2 + btnHeight
+
+  wApi.setButton (btnReactorControlID, btnDrawX    , btnDrawY, btnWidth * 2 + btnPaddingX, btnHeight, 0xAAAAAA, 0xFFFFFF, "Automatic Control: "..reactorStatus)
+
   drawBox(1, 1, width + 1, height + 1)
   drawBox(1, height + 2, width + 1, height + 1)
 
-  --[[ Event listener thread
+  -- Event listener thread
   local eventListenerT = thread.create(function()
     repeat
       local id, _, x, y = event.pullMultiple("touch", "interrupted")
@@ -217,16 +221,9 @@ function run()
       end
 
     until false
-  end)]]
+  end)
 
   while running do
-    local id, _, x, y = event.pullMultiple("touch", "interrupted")
-    if id == "interrupted" then
-      handleInterrupt()
-    elseif id == "touch" then
-      mouseDown(x, y)
-    end
-
     local RFProduced = reactor.getEnergyStored() - currentRf
     currentRF = reactor.getEnergyStored()
     currentFuel = reactor.getFuelAmount()
@@ -243,37 +240,36 @@ function run()
     gpu.setBackground(0xFFFF33)
     gpu.fill(2, height + 3, percentFuelFilled, height, " ")
 
-    bApi.drawAll()
-    gpu.setForeground(0xFFFFFF)
-
-    drawX = btnDrawX + btnWidth + btnPaddingX + btnWidth + btnPaddingX
-    drawY = btnDrawY + btnPaddingY + math.floor(btnHeight / 2)
-
-    gpu.setBackground(0x000000)
-    gpu.set(drawX, drawY, "              ")
-    gpu.setBackground(0x4863A0)
-    gpu.set(drawX, drawY, getMinPercent().."%".." Min")
-
-    drawY = drawY + math.floor(btnHeight / 2) + btnHeight
-    gpu.setBackground(0x000000)
-    gpu.set(drawX, drawY, "              ")
-    gpu.setBackground(0x4863A0)
-    gpu.set(drawX, drawY, getMaxPercent().."%".." Max")
-
-    if percentFilled >= getMaxPercent() then
+    if reactorState == "automatic" then
+      if percentFilled >= getMaxPercent() then
+        reactorOff()
+      elseif percentFilled <= getMinPercent() then
+        reactorOn()
+      end
+    elseif reactorState == "on" then
+      reactorOn()
+    else
       reactorOff()
     end
 
-    if percentFilled <= getMinPercent() then
-      reactorOn()
-    end
-
-
     if reactor.getActive() then
-      reactorStatus = "On"
+      reactorStatus = "ON"
     else
-      reactorStatus = "Off"
+      reactorStatus = "OFF"
     end
+
+    if reactorState == "automatic" then
+      wApi.setButtonText(btnReactorControlID, "Automatic Control: "..reactorStatus)
+      wApi.setButtonBackground(btnReactorControlID, 0xAAAAAA)
+    elseif reactorState == "on" then
+      wApi.setButtonText(btnReactorControlID, "ON")
+      wApi.setButtonBackground(btnReactorControlID, 0x00FF00)
+    elseif reactorState == "off" then
+      wApi.setButtonText(btnReactorControlID, "OFF")
+      wApi.setButtonBackground(btnReactorControlID, 0xFF0000)
+    end
+
+    wApi.drawAll()
 
     os.sleep(0.1)
   end
