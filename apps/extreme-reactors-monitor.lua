@@ -109,8 +109,9 @@ local readConfig = function()
 end
 
 local createConfig = function()
-  setMinPercent(5)
-  setMaxPercent(95)
+  config.percentages = {}
+  config.percentages.minPercent = 5
+  config.percentages.maxPercent = 95
 
   fs.makeDirectory("/fractal/apps/settings")
   saveConfig()
@@ -171,14 +172,7 @@ function run()
   currentRf = reactor.getEnergyStored()
   maxFuel = reactor.getFuelAmountMax()
 
-  gpu.setForeground(0xFFFFFF)
-  gpu.setBackground(0x000000)
-  gpu.fill(1, 1, w, h, " ")
-
-  gpu.setForeground(0xFFFFFF)
-  gpu.setBackground(0x333333)
-  drawBox(1, 1, w - 1, h - 1)
-
+  -- Create all the GUI elements
   local width = 100
   local height = 15
 
@@ -196,7 +190,6 @@ function run()
   wApi.setButton (btnSubMinID, btnDrawX     , btnDrawY    , btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
   wApi.setButton (btnAddMinID, btnDrawXRight, btnDrawY    , btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "+")
   wApi.setTextBox(txtMinID   , btnDrawTxtBox, btnDrawY + 1, txtWidth, txtHeight, 0x4863A0, 0xFFFFFF, tostring(getMinPercent()).."%")
-
   btnDrawY = btnDrawY + btnPaddingY * 2 + btnHeight
 
   wApi.setButton (btnSubMaxID, btnDrawX     , btnDrawY    , btnWidth, btnHeight, 0x4863A0, 0xFFFFFF, "-")
@@ -207,10 +200,19 @@ function run()
 
   wApi.setButton (btnReactorControlID, btnDrawX    , btnDrawY, btnWidth * 2 + btnPaddingX, btnHeight, 0xAAAAAA, 0xFFFFFF, "Automatic Control: "..reactorStatus)
 
+  -- Draw the initial window template
+  gpu.setForeground(0xFFFFFF)
+  gpu.setBackground(0x000000)
+  gpu.fill(1, 1, w, h, " ")
+
+  gpu.setForeground(0xFFFFFF)
+  gpu.setBackground(0x333333)
+  drawBox(1, 1, w - 1, h - 1)
+
   drawBox(1, 1, width + 1, height + 1)
   drawBox(1, height + 2, width + 1, height + 1)
 
-  -- Event listener thread
+  -- Event listener thread for clicks n stuff
   local eventListenerT = thread.create(function()
     repeat
       local id, _, x, y = event.pullMultiple("touch", "interrupted")

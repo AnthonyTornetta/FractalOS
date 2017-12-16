@@ -159,6 +159,10 @@ function api.getTextBoxDimensions(id)
   return textBoxes[id]["width"], textBoxes[id]["height"]
 end
 
+function api.textBoxExists(id)
+  return textBoxes[id] ~= nil
+end
+
 function api.setTextBoxDimensions(id, w, h)
   assert(type(w) == "number", "width must be number")
   assert(type(h) == "number", "height must be number")
