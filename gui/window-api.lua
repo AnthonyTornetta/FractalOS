@@ -127,6 +127,7 @@ function api.withinButtons(x, y)
 end
 
 function api.setTextBox(id, x, y, width, height, bgcolor, fgcolor, text)
+  assert(id ~= nil, "text box id is nil")
   assert(type(x) == "number", "x must be number")
   assert(type(y) == "number", "y must be number")
   assert(type(width) == "number", "width must be number")
