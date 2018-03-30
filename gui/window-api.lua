@@ -31,6 +31,7 @@ function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
   buttons[id]["width"]  = width
   buttons[id]["height"] = height
   buttons[id]["text-align"] = "center"
+  buttons[id]["text-align-veticle"] = "center"
 end
 
 function api.getButtonPosition(id)
@@ -43,11 +44,20 @@ end
 
 function api.setButtonAlignment(id, alignment)
   assert(type(alignment) == "string", "alignment must be string")
-  buttons[id]["text-align"] = centered
+  buttons[id]["text-align"] = alignment
 end
 
 function api.getButtonTextAlignment(id)
   return buttons[id]["text-align"]
+end
+
+function api.setButtonAlignmentVertical(id, alignment)
+  assert(type(alignment) == "string", "alignment must be string")
+  buttons[id]["text-align-vertical"] = alignment
+end
+
+function api.getButtonTextAlignmentVertical(id)
+  return buttons[id]["text-align-vertical"]
 end
 
 function api.getButtonBackgroundColor(id)
@@ -92,13 +102,19 @@ function api.drawButton(id)
 
   if alignment == "left" then
     drawX = x
-    drawY = y + height / 2 - 1
   elseif alignment == "right" then
     drawX = (x + width) - (#buttons[id]["text"])
-    drawY = y + height / 2 - 1
   else
     drawX = x + (width / 2) - (#buttons[id]["text"] / 2)
-    drawY = y + math.floor(height / 2)
+  end
+
+  local vAlignment = api.getButtonTextAlignmentVertical(id)
+  if vAlignment == "top" then
+    drawY = y -- works
+  elseif vAlignment == "bottom" then
+    drawY = y + height - 1
+  else
+    drawY = y + math.floor(y + height / 2)
   end
 
   gpu.set(drawX, drawY, buttons[id]["text"])
@@ -123,7 +139,7 @@ function api.withinButtons(x, y)
       end
     end
   end
-  return -1
+  return nil
 end
 
 function api.setTextBox(id, x, y, width, height, bgcolor, fgcolor, text)
