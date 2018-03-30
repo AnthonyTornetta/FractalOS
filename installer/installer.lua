@@ -96,6 +96,7 @@ printCentered("Installing...", line)
 local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/master/"
 printCentered("Installing Core Components...", 9)
 getFileFromURL(githubRoot.."core/fractalcore.lua", "/lib/fractalcore.lua")
+getFileFromURL(githubRoot.."gui/window-api.lua", "/lib/window-api.lua")
 os.sleep(1)
 local fractalCore = require("fractalcore")
 
