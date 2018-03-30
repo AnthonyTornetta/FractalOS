@@ -19,7 +19,7 @@ local txtNameId = "txt-name"
 
 function mouseDown(x, y)
   local btnId = wApi.withinButtons(x, y)
-  if btnId ~= -1 then
+  if btnId ~= nil then
     if btnId == btnPlayId and tape ~= nil and tape.isReady() then
       if tape.getState() ~= "PLAYING" then
         tape.play()
@@ -76,7 +76,7 @@ local eventListenerT = thread.create(function()
 end)
 
 while running do
-  if tape ~= nil and tape.isReady() then
+  if tape ~= nil and tape.getState() ~= nil and tape.getLabel() ~= nil and tape.isReady() then
     wApi.setTextBoxText(txtStateId, tape.getState())
     wApi.setTextBoxText(txtNameId, tape.getLabel())
   else

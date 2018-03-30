@@ -114,7 +114,7 @@ function api.drawButton(id)
   elseif vAlignment == "bottom" then
     drawY = y + height - 1
   else
-    drawY = y + math.floor(y + height / 2)
+    drawY = y + math.floor(height / 2)
   end
 
   gpu.set(drawX, drawY, buttons[id]["text"])

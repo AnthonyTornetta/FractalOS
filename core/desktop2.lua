@@ -80,24 +80,36 @@ end
 local setupButtons = function()
   local lastFileIndex = 0
 
+  local btnWidth = 20
+  local btnHeight = 9
+
+  local iconsPerRow = math.floor(w / btnWidth)
+  local paddingBetweenX = (w % btnWidth) / iconsPerRow
+
+  local iconsPerCol = math.floor(h / btnHeight)
+  local paddingBetweenY = (h % btnHeight) / iconsPerCol
+
+  --[[
   for k, v in ipairs(files) do
-    local x = (k) * 14 + ((w % 4) / 2)
-    local y = (x % w) / 8 + 4
+    local id = k - 1
+
+    local x = (id * btnWidth + (id + 1) * paddingBetweenX)
+    local column = math.floor((x + btnWidth) / w)
+    x = x % w
+    local y = column * btnHeight + (column + 1) * paddingBetweenY
 
     --setButton(id, x, y, width, height, bgcolor, fgcolor, text)
-    winApi.setButton(k, x, y, 12, 6, 0x333333, 0x888888, v)
-    winApi.setButtonAlignmentVertical(k, "bottom")
-    
-    lastFileIndex = k
+    winApi.setButton(id, x, y, btnWidth, btnHeight, 0x333333, 0x888888, v)
+    winApi.setButtonAlignmentVertical(id, "bottom")
+
+    lastFileIndex = id
   end
-
+]]
   for k, v in ipairs(directories) do
-    local x = (lastFileIndex + k + 1) * 14 + ((w % 4) / 2)
-    local y = (x % w) / 8 + 4
+    
 
-    --setButton(id, x, y, width, height, bgcolor, fgcolor, text)
-    winApi.setButton(k, x, y, 12, 6, 0x555555, 0x999999, v)
-    winApi.setButtonAlignmentVertical(k, "bottom")
+    winApi.setButton(id, x, y, btnWidth, btnHeight, 0x555555, 0x999999, v)
+    winApi.setButtonAlignmentVertical(id, "bottom")
   end
 end
 
