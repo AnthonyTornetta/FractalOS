@@ -2,8 +2,9 @@ local comp = require("component")
 local gpu = comp.gpu
 
 local api = {}
-buttons = {}
-textBoxes = {}
+local buttons = {}
+local textBoxes = {}
+local pBars = {}
 
 function api.clearButtons()
   buttons = {}
@@ -11,6 +12,16 @@ end
 
 function api.clearTextBoxes()
   textBoxes = {}
+end
+
+function api.clearProgressBars()
+  pBars = {}
+end
+
+function api.clearAll()
+  api.clearButtons()
+  api.clearTextBoxes()
+  api.clearProgressBars()
 end
 
 function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
@@ -246,9 +257,93 @@ function api.getTextBoxDimentions(id)
   return textBoxes[id]["width"], textBoxes[id]["height"]
 end
 
+-- HERE
+function api.setProgressBar(id, x, y, width, height, bgcolor, fgcolor)
+  assert(type(x) == "number", "x must be number")
+  assert(type(y) == "number", "y must be number")
+  assert(type(width) == "number", "width must be number")
+  assert(type(height) == "number", "height must be number")
+  assert(type(bgcolor) == "number", "Background Color must be color")
+  assert(type(fgcolor) == "number", "Foreground Color must be color")
+
+  pBars[id] = {}
+  pBars[id]["x"] = x
+  pBars[id]["y"] = y
+  pBars[id]["bgcol"] = bgcolor
+  pBars[id]["fgcol"] = fgcolor
+  pBars[id]["width"]  = width
+  pBars[id]["height"] = height
+  pBars[id]["progress"] = 0.0
+end
+
+function api.getProgressBarColors(id)
+  return pBars[id]["bgcol"], pBars[id]["fgcol"]
+end
+
+function api.getProgressBarProgress(id)
+  return pBars[id]["progress"]
+end
+
+function api.getProgressBarPosition(id)
+  return pBars[id]["x"], pBars[id]["y"]
+end
+
+function api.getProgressBarDimensions(id)
+  return pBars[id]["width"], pBars[id]["height"]
+end
+
+function api.setProgressBarColors(id, bg, fg)
+  assert(type(bg) == "number", "Background Color must be color")
+  assert(type(fg) == "number", "Foreground Color must be color")
+  pBars[id]["bgcol"] = bg
+  pBars[id]["fgcol"] = fg
+end
+
+function api.setProgressBarProgress(id, progress)
+  assert(type(progress) == "number", "Progress amount must be number")
+  pBars[id]["progress"] = progress
+end
+
+function api.setProgressBarPosition(id, x, y)
+  assert(type(x) == "number", "x must be number")
+  assert(type(y) == "number", "y must be number")
+  pBars[id]["x"] = x
+  pBars[id]["y"] = y
+end
+
+function api.setProgressBarDimensions(id, width, height)
+  assert(type(width) == "number", "width must be number")
+  assert(type(height) == "number", "height must be number")
+  pBars[id]["width"] = width
+  pBars[id]["height"] = height
+end
+
+function api.drawProgressBar(id)
+  local bgCol, fgCol = api.getProgressBarColors(id)
+
+  local prevBG = gpu.setBackground(bgCol)
+
+  local progress = api.getProgressBarProgress(id)
+  local x, y = api.getProgressBarPosition(id)
+  local w, h = api.getProgressBarDimensions(id)
+
+  gpu.fill(x + progress, y, w - progress, h, " ")
+  gpu.setBackground(fgCol)
+  gpu.fill(x, y, progress, h, " ")
+
+  gpu.setBackground(prevBG)
+end
+
+function api.drawAllProgressBars()
+  for k, v in pairs(pBars) do
+    api.drawProgressBar(k)
+  end
+end
+
 function api.drawAll()
   api.drawAllButtons()
   api.drawAllTextBoxes()
+  api.drawAllProgressBars()
 end
 
 
