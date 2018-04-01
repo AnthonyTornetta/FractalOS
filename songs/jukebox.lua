@@ -7,6 +7,14 @@ local event = require("event")
 local tape = comp.tape_drive
 local gpu  = comp.gpu
 
+local prevState = "STOPPED"
+local lamps = {}
+
+for address in comp.list('colorful_lamp') do
+  local lamp = comp.proxy(address)
+  table.insert(lamps, lamp)
+end
+
 local running = true
 
 local btnPlayId = "btn-play"
@@ -77,9 +85,25 @@ end)
 
 while running do
   if tape ~= nil and tape.getState() ~= nil and tape.getLabel() ~= nil and tape.isReady() then
+    if prevState ~= tape.getState() then
+      prevState = tape.getState()
+      for k, v in pairs(lamps) do
+        if(tape.getState() == "PLAYING") then
+          v.setLampColor(992) -- Green
+        else
+          v.setLampColor(32767) -- White
+        end
+      end
+    end
     wApi.setTextBoxText(txtStateId, tape.getState())
     wApi.setTextBoxText(txtNameId, tape.getLabel())
   else
+    if prevState ~= "No Tape" then
+      prevState = "No Tape"
+      for k, v in pairs(lamps) do
+        v.setLampColor(32767) -- White
+      end
+    end
     wApi.setTextBoxText(txtStateId, "No Tape")
     wApi.setTextBoxText(txtNameId, "No Tape")
   end
