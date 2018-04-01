@@ -80,36 +80,41 @@ end
 local setupButtons = function()
   local lastFileIndex = 0
 
-  local btnWidth = 20
-  local btnHeight = 9
+  local iconWidth = 10
+  local iconPaddingX = 2
+  local iconTotalWidth = iconPaddingX + iconWidth
 
-  local iconsPerRow = math.floor(w / btnWidth)
-  local paddingBetweenX = (w % btnWidth) / iconsPerRow
+  local iconHeight = 6
+  local iconPaddingY = 2
+  local iconTotalHeight = iconHeight + iconPaddingY
 
-  local iconsPerCol = math.floor(h / btnHeight)
-  local paddingBetweenY = (h % btnHeight) / iconsPerCol
+  local lastFileIconId = 0
 
+  local currentX = iconPaddingX
+  local currentY = iconPaddingY
   --[[
   for k, v in ipairs(files) do
-    local id = k - 1
-
-    local x = (id * btnWidth + (id + 1) * paddingBetweenX)
-    local column = math.floor((x + btnWidth) / w)
-    x = x % w
-    local y = column * btnHeight + (column + 1) * paddingBetweenY
+    local id = k
 
     --setButton(id, x, y, width, height, bgcolor, fgcolor, text)
     winApi.setButton(id, x, y, btnWidth, btnHeight, 0x333333, 0x888888, v)
     winApi.setButtonAlignmentVertical(id, "bottom")
 
-    lastFileIndex = id
+    lastFileIconId = id
   end
 ]]
   for k, v in ipairs(directories) do
-    
+    local id = k + lastFileIconId
 
-    winApi.setButton(id, x, y, btnWidth, btnHeight, 0x555555, 0x999999, v)
+    if currentX + iconTotalWidth > w then
+      currentX = iconPaddingX
+      currentY = currentY + iconHeight + iconPaddingY
+    end
+
+    winApi.setButton(id, currentX, currentY, iconWidth, iconHeight, 0x555555, 0x999999, v)
     winApi.setButtonAlignmentVertical(id, "bottom")
+
+    currentX = currentX + iconWidth + iconPaddingX
   end
 end
 
@@ -130,16 +135,17 @@ local init = function()
 
   setupButtons()
 
+  drawBackground()
+  winApi.drawAll()
+
   while running do
-    drawBackground()
-
-    winApi.drawAll()
-
     os.sleep(0.1)
   end
 
   gpu.setForeground(0xFFFFFF)
   gpu.setBackground(0x000000)
+
+  winApi.clearAll()
   os.execute("cls")
   os.exit()
 end
