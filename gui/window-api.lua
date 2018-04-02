@@ -340,10 +340,81 @@ function api.drawAllProgressBars()
   end
 end
 
+function api.setBox(id, x, y, width, height, bgcol)
+  assert(type(x) == "number", "x must be number")
+  assert(type(y) == "number", "y must be number")
+  assert(type(width) == "number", "width must be number")
+  assert(type(height) == "number", "height must be number")
+  assert(type(bgcolor) == "number", "Background Color must be color")
+
+  boxes[id] = {}
+  boxes[id]["x"] = x
+  boxes[id]["y"] = y
+  boxes[id]["bgcol"] = bgcolor
+  boxes[id]["width"]  = width
+  boxes[id]["height"] = height
+end
+
+function api.getBoxPosition(id)
+  return boxes[id]["x"], boxes[id]["y"]
+end
+
+function api.getBoxDimensions(id)
+  return boxes[id]["width"], boxes[id]["height"]
+end
+
+function api.getBoxColor(id)
+  return boxes[id]["bgcol"]
+end
+
+function api.setBoxPosition(id, x, y)
+  assert(type(x) == "number", "x must be number")
+  assert(type(y) == "number", "y must be number")
+  boxes[id]["x"] = x
+  boxes[id]["y"] = y
+end
+
+function api.setTextBoxDimensions(id, width, height)
+  assert(type(width) == "number", "width must be number")
+  assert(type(height) == "number", "height must be number")
+  boxes[id]["width"]  = width
+  boxes[id]["height"] = height
+end
+
+function api.setBoxColor(id, bgcol)
+  assert(type(bgcolor) == "number", "Background Color must be color")
+  boxes[id]["bgcol"] = bgcolor
+end
+
+function api.drawBox(id)
+  local bgCol = api.getProgressBoxColor(id)
+  local prevBG = gpu.setBackground(bgCol)
+
+  local x, y = api.getProgressBarPosition(id)
+  local w, h = api.getProgressBarDimensions(id)
+  gpu.fill(x, y, w, h, " ")
+
+  gpu.setBackground(prevBG)
+end
+
+function api.drawAllBoxes()
+  for k, v in pairs(boxes) do
+    api.drawBox(k)
+  end
+end
+
 function api.drawAll()
-  api.drawAllButtons()
-  api.drawAllTextBoxes()
+  -- Stage 1
+  api.drawAllBoxes()
+
+  -- Stage 2
   api.drawAllProgressBars()
+
+  -- Stage 3
+  api.drawAllTextBoxes()
+
+  -- Stage 4
+  api.drawAllButtons()
 end
 
 

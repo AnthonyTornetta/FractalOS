@@ -80,31 +80,33 @@ end
 local setupButtons = function()
   local lastFileIndex = 0
 
-  local iconWidth = 10
+  local iconWidth = 12
   local iconPaddingX = 2
   local iconTotalWidth = iconPaddingX + iconWidth
 
   local iconHeight = 6
   local iconPaddingY = 2
-  local iconTotalHeight = iconHeight + iconPaddingY
-
-  local lastFileIconId = 0
 
   local currentX = iconPaddingX
   local currentY = iconPaddingY
-  --[[
-  for k, v in ipairs(files) do
-    local id = k
 
-    --setButton(id, x, y, width, height, bgcolor, fgcolor, text)
-    winApi.setButton(id, x, y, btnWidth, btnHeight, 0x333333, 0x888888, v)
+  local id = 0
+
+  for k, v in ipairs(files) do
+    id = id + 1
+
+    if currentX + iconTotalWidth > w then
+      currentX = iconPaddingX
+      currentY = currentY + iconHeight + iconPaddingY
+    end
+
+    winApi.setButton(id, currentX, currentY, iconWidth, iconHeight, 0x555555, 0x999999, v)
     winApi.setButtonAlignmentVertical(id, "bottom")
 
-    lastFileIconId = id
+    currentX = currentX + iconWidth + iconPaddingX
   end
-]]
   for k, v in ipairs(directories) do
-    local id = k + lastFileIconId
+    id = id + 1
 
     if currentX + iconTotalWidth > w then
       currentX = iconPaddingX
