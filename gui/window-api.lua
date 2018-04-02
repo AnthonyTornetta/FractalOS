@@ -25,13 +25,13 @@ function api.clearAll()
 end
 
 function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
-  assert(type(x) == "number", "x must be number")
-  assert(type(y) == "number", "y must be number")
-  assert(type(width) == "number", "width must be number")
-  assert(type(height) == "number", "height must be number")
-  assert(type(bgcolor) == "number", "Background Color must be color")
-  assert(type(fgcolor) == "number", "Foreground Color must be color")
-  assert(type(text) == "string", "text must be string")
+  checkArg(2, x, "number")
+  checkArg(2, y, "number")
+  checkArg(2, width, "number")
+  checkArg(2, height, "number")
+  checkArg(2, bgcolor, "number")
+  checkArg(2, fgcolor, "number")
+  checkArg(2, text, "string")
 
   buttons[id] = {}
   buttons[id]["x"] = x
@@ -54,7 +54,7 @@ function api.getButtonDimentions(id)
 end
 
 function api.setButtonAlignment(id, alignment)
-  assert(type(alignment) == "string", "alignment must be string")
+  checkArg(2, alignment, "string")
   buttons[id]["text-align"] = alignment
 end
 
@@ -63,7 +63,7 @@ function api.getButtonTextAlignment(id)
 end
 
 function api.setButtonAlignmentVertical(id, alignment)
-  assert(type(alignment) == "string", "alignment must be string")
+  checkArg(2, alignment, "string")
   buttons[id]["text-align-vertical"] = alignment
 end
 
@@ -84,17 +84,17 @@ function api.getButtonColors(id)
 end
 
 function api.setButtonBackground(id, c)
-  assert(type(c) == "number", "color must be number")
+  checkArg(2, c, "number")
   buttons[id]["bgcol"] = c
 end
 
 function api.setButtonForeground(id, c)
-  assert(type(c) == "number", "color must be number")
+  checkArg(2, c, "number")
   buttons[id]["fgcol"] = c
 end
 
 function api.setButtonText(id, text)
-  assert(type(text) == "string", "text must be string")
+  checkArg(2, text, "string")
   buttons[id]["text"] = text
 end
 
@@ -138,8 +138,8 @@ function api.drawAllButtons()
 end
 
 function api.withinButtons(x, y)
-  assert(type(x) == "number", "x must be number")
-  assert(type(y) == "number", "y must be number")
+  checkArg(2, x, "number")
+  checkArg(3, y, "number")
 
   for id, _ in pairs(buttons) do
     local btnX, btnY = api.getButtonPosition(id)
@@ -155,13 +155,13 @@ end
 
 function api.setTextBox(id, x, y, width, height, bgcolor, fgcolor, text)
   assert(id ~= nil, "text box id is nil")
-  assert(type(x) == "number", "x must be number")
-  assert(type(y) == "number", "y must be number")
-  assert(type(width) == "number", "width must be number")
-  assert(type(height) == "number", "height must be number")
-  assert(type(bgcolor) == "number", "Background Color must be color")
-  assert(type(fgcolor) == "number", "Foreground Color must be color")
-  assert(type(text) == "string", "text must be string")
+  checkArg(2, x, "number")
+  checkArg(3, y, "number")
+  checkArg(4, width, "number")
+  checkArg(5, height, "number")
+  checkArg(6, bgcolor, "number")
+  checkArg(7, fgcolor, "number")
+  checkArg(8, text, "string")
 
   textBoxes[id] = {}
   textBoxes[id]["x"] = x
@@ -179,7 +179,7 @@ function api.getTextBoxText(id)
 end
 
 function api.setTextBoxText(id, text)
-  assert(type(text) == "string", "text must be string")
+  checkArg(2, text, "string")
   textBoxes[id]["text"] = text
 end
 
@@ -192,8 +192,8 @@ function api.textBoxExists(id)
 end
 
 function api.setTextBoxDimensions(id, w, h)
-  assert(type(w) == "number", "width must be number")
-  assert(type(h) == "number", "height must be number")
+  checkArg(2, w, "number")
+  checkArg(3, h, "number")
   if w ~= nil then
     textBoxes[id]["width"] = w
   end
@@ -211,7 +211,7 @@ function api.getTextBoxColors(id)
 end
 
 function api.setTextBoxAlignment(id, alignment)
-  assert(type(alignment) == "string", "alignment must be number")
+  checkArg(2, alignment, "string")
   textBoxes[id]["alignment"] = alignment
 end
 
@@ -257,14 +257,13 @@ function api.getTextBoxDimentions(id)
   return textBoxes[id]["width"], textBoxes[id]["height"]
 end
 
--- HERE
 function api.setProgressBar(id, x, y, width, height, bgcolor, fgcolor)
-  assert(type(x) == "number", "x must be number")
-  assert(type(y) == "number", "y must be number")
-  assert(type(width) == "number", "width must be number")
-  assert(type(height) == "number", "height must be number")
-  assert(type(bgcolor) == "number", "Background Color must be color")
-  assert(type(fgcolor) == "number", "Foreground Color must be color")
+  checkArg(2, x, "number")
+  checkArg(3, y, "number")
+  checkArg(4, width, "number")
+  checkArg(5, height, "number")
+  checkArg(6, bgcolor, "number")
+  checkArg(7, fgcolor, "number")
 
   pBars[id] = {}
   pBars[id]["x"] = x
@@ -293,27 +292,27 @@ function api.getProgressBarDimensions(id)
 end
 
 function api.setProgressBarColors(id, bg, fg)
-  assert(type(bg) == "number", "Background Color must be color")
-  assert(type(fg) == "number", "Foreground Color must be color")
+  checkArg(2, bg, "number")
+  checkArg(2, fg, "number")
   pBars[id]["bgcol"] = bg
   pBars[id]["fgcol"] = fg
 end
 
 function api.setProgressBarProgress(id, progress)
-  assert(type(progress) == "number", "Progress amount must be number")
+  checkArg(2, progress, "number")
   pBars[id]["progress"] = progress
 end
 
 function api.setProgressBarPosition(id, x, y)
-  assert(type(x) == "number", "x must be number")
-  assert(type(y) == "number", "y must be number")
+  checkArg(2, x, "number")
+  checkArg(3, y, "number")
   pBars[id]["x"] = x
   pBars[id]["y"] = y
 end
 
 function api.setProgressBarDimensions(id, width, height)
-  assert(type(width) == "number", "width must be number")
-  assert(type(height) == "number", "height must be number")
+  checkArg(2, width, "number")
+  checkArg(3, height, "number")
   pBars[id]["width"] = width
   pBars[id]["height"] = height
 end
@@ -341,11 +340,11 @@ function api.drawAllProgressBars()
 end
 
 function api.setBox(id, x, y, width, height, bgcol)
-  assert(type(x) == "number", "x must be number")
-  assert(type(y) == "number", "y must be number")
-  assert(type(width) == "number", "width must be number")
-  assert(type(height) == "number", "height must be number")
-  assert(type(bgcolor) == "number", "Background Color must be color")
+  checkArg(2, x, "number")
+  checkArg(3, y, "number")
+  checkArg(2, width, "number")
+  checkArg(5, height, "number")
+  checkArg(6, bgcol, "number")
 
   boxes[id] = {}
   boxes[id]["x"] = x
@@ -368,21 +367,21 @@ function api.getBoxColor(id)
 end
 
 function api.setBoxPosition(id, x, y)
-  assert(type(x) == "number", "x must be number")
-  assert(type(y) == "number", "y must be number")
+  checkArg(2, x, "number")
+  checkArg(3, y, "number")
   boxes[id]["x"] = x
   boxes[id]["y"] = y
 end
 
 function api.setTextBoxDimensions(id, width, height)
-  assert(type(width) == "number", "width must be number")
-  assert(type(height) == "number", "height must be number")
+  checkArg(2, width, "number")
+  checkArg(3, height, "number")
   boxes[id]["width"]  = width
   boxes[id]["height"] = height
 end
 
 function api.setBoxColor(id, bgcol)
-  assert(type(bgcolor) == "number", "Background Color must be color")
+  checkArg(2, bgcolor, "number")
   boxes[id]["bgcol"] = bgcolor
 end
 

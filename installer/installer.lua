@@ -111,8 +111,12 @@ fs.makeDirectory(fractalCore.getDir("user"))
 getFileFromURL(githubRoot.."core/desktop.lua", fractalCore.getDir("core").."desktop.lua")
 getFileFromURL(githubRoot.."core/boot.lua", fractalCore.getDir("root").."boot.lua")
 
+printCentered("Installing Additional Components...")
+
+
 printCentered("                                              ", 9)
 printCentered("Done!...", 9)
+os.sleep(2)
 gpu.setResolution(oW, oH)
 gpu.setForeground(0xFFFFFF)
 gpu.setBackground(0x000000)
