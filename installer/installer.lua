@@ -111,8 +111,10 @@ fs.makeDirectory(fractalCore.getDir("user"))
 getFileFromURL(githubRoot.."core/desktop.lua", fractalCore.getDir("core").."desktop.lua")
 getFileFromURL(githubRoot.."core/boot.lua", fractalCore.getDir("root").."boot.lua")
 
-printCentered("Installing Additional Components...")
-
+printCentered("Installing Additional Components...", 9)
+if comp.isAvailable("tape_drive") then
+  getFileFromURL(githubRoot.."apps/jukebox.lua", fractalCore.getDir("apps").."jukebox.lua")
+end
 
 printCentered("                                              ", 9)
 printCentered("Done!...", 9)
