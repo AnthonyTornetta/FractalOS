@@ -1,6 +1,8 @@
 local comp = require("component")
 local fs = require("filesystem")
 
+local internet = comp.internet
+
 local api = {}
 
 function api.internetRequest(url)
@@ -46,13 +48,13 @@ function api.runFromUrl(url, ...)
 
   local success, response = api.internetRequest(url)
   if success then
-    result, reason = load(result)
-		if result then
-			result = { pcall(result, ...) }
-			if result[1] then
-				return table.unpack(result, 2)
+    response, reason = load(response)
+		if response then
+			response = { pcall(response, ...) }
+			if response[1] then
+				return table.unpack(response, 2)
 			else
-				return false, "Failed to run script: "..tostring(result[2])
+				return false, "Failed to run script: "..tostring(response[2])
 			end
 		else
 			return false, "Failed to run script: "..tostring(loadReason)
