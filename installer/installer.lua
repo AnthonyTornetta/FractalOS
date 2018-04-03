@@ -1,6 +1,5 @@
 local comp = require("component")
 local fs = require("filesystem")
-local key = require("keyboard")
 local event = require("event")
 local term = require("term")
 
@@ -96,7 +95,9 @@ printCentered("Installing...", line)
 local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/master/"
 printCentered("Installing Core Components...", 9)
 getFileFromURL(githubRoot.."core/fractalcore.lua", "/lib/fractalcore.lua")
-getFileFromURL(githubRoot.."gui/window-api.lua", "/lib/window-api.lua")
+getFileFromURL(githubRoot.."libs/window-api.lua", "/lib/window-api.lua")
+getFileFromURL(githubRoot.."libs/web.lua", "/lib/web.lua")
+
 os.sleep(1)
 local fractalCore = require("fractalcore")
 
@@ -122,4 +123,4 @@ os.sleep(2)
 gpu.setResolution(oW, oH)
 gpu.setForeground(0xFFFFFF)
 gpu.setBackground(0x000000)
-os.execute("cls")
+term.clear()
