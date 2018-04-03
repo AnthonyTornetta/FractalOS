@@ -350,7 +350,7 @@ function api.setBox(id, x, y, width, height, bgcol)
   boxes[id] = {}
   boxes[id]["x"] = x
   boxes[id]["y"] = y
-  boxes[id]["bgcol"] = bgcolor
+  boxes[id]["bgcol"] = bgcol
   boxes[id]["width"]  = width
   boxes[id]["height"] = height
 end
@@ -387,11 +387,11 @@ function api.setBoxColor(id, bgcol)
 end
 
 function api.drawBox(id)
-  local bgCol = api.getProgressBoxColor(id)
+  local bgCol = api.getBoxColor(id)
   local prevBG = gpu.setBackground(bgCol)
 
-  local x, y = api.getProgressBarPosition(id)
-  local w, h = api.getProgressBarDimensions(id)
+  local x, y = api.getBoxPosition(id)
+  local w, h = api.getBoxDimensions(id)
   gpu.fill(x, y, w, h, " ")
 
   gpu.setBackground(prevBG)

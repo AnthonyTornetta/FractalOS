@@ -35,8 +35,23 @@ end
 
 -- Event Handlers
 local mouseDown = function(x, y, mouseBtn, player)
-  touchX, touchY = x, y
+  local btnId = wApi.withinButtons(x, y)
+  print(btnId)
+  if btnId ~= nil then
+    if btnId == btnGo then
+      print("makeme")
+    else
+      if(fractalCore.tableLength(files) <= btnId) then
+        handleInterrupt()
+        local appThread = thread.create(
+        function()
+          os.execute(files[btnId])
+        end)
+      end
+    end
+  end
 end
+
 local mouseUp = function(x, y, mouseBtn, player)
   touchX, touchY = -1, -1
 end
@@ -95,6 +110,11 @@ local setupButtons = function()
   for k, v in ipairs(files) do
     id = id + 1
 
+    gpu.setForeground(0xFFFFFF)
+    print(k)
+    print(files[k])
+    os.sleep(4)
+
     if currentX + iconTotalWidth > w then
       currentX = iconPaddingX
       currentY = currentY + iconHeight + iconPaddingY
@@ -120,8 +140,13 @@ local setupButtons = function()
   end
 end
 
+local taskBarBox = "task-bar-box"
+local btnGo = "go-btn"
+
 local setupTaskbar = function()
-  winApi.setBox("task-bar", 0, h - 10, w, 10, 0x999999)
+  winApi.setBox(taskBarBox, 1, h - 4, w, 5, 0x999999)
+
+  winApi.setButton(btnGo, 1, h - 4, 11, 5, 0x4444FF, 0xFFFFFF, "Go!")
 end
 
 local init = function()
