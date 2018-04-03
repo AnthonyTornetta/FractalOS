@@ -1,3 +1,4 @@
+local comp = require("component")
 local fs = require("filesystem")
 
 local api = {}
