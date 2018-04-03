@@ -6,12 +6,12 @@ print("Booting Fractal OS...")
 local boot = function()
   if not fs.isDirectory(fractalCore.getDir("root")) then
     print("CRITICAL ERROR: The root directory of Fractal OS is missing!")
-    print("Solution: re-install the OS; the pastebin is "..fractalCore.installPastebin)
+    print("Solution: re-install the OS; the pastebin is "..fractalCore.getInstallPastebin())
     os.exit()
   end
   if not fs.isDirectory(fractalCore.getDir("core")) then
     print("CRITICAL ERROR: The core directory of Fractal OS is missing!")
-    print("Solution: re-install the OS; the pastebin is "..fractalCore.installPastebin)
+    print("Solution: re-install the OS; the pastebin is "..fractalCore.getInstallPastebin())
     os.exit()
   end
   if not fs.isDirectory(fractalCore.getDir("apps")) then
@@ -73,7 +73,5 @@ local boot = function()
   print("All directories found...")
   os.execute(fractalCore.getDir("core").."desktop.lua")
 end
-
-
 
 boot()

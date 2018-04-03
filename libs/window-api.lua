@@ -5,6 +5,7 @@ local api = {}
 local buttons = {}
 local textBoxes = {}
 local pBars = {}
+local boxes = {}
 
 function api.clearButtons()
   buttons = {}

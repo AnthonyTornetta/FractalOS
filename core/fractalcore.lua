@@ -14,7 +14,7 @@ function fractalCore.getInstallPastebin()
 end
 
 local keysDown = {}
-for i=0, 255 do
+for i = 0, 255 do
   keysDown[i] = false
 end
 
@@ -36,11 +36,6 @@ local lowerKeys =
   ["LCONTROL"] = 29, ["LALT"] = 56, [" "] = 57, ["RALT"] = 184, ["RCONTROL"] = 157, ["UP"] = 200, ["LEFT"] = 203, ["RIGHT"] = 205, ["DOWN"] = 208,
   ["DELETE"] = 211, ["INSERT"] = 210, ["HOME"] = 199, ["PAGEUP"] = 201, ["PAGEDOWN"] = 209, ["END"] = 207, ["NUMLOCK"] = 69,
   ["1"] = 2, ["2"] = 3, ["3"] = 4, ["4"] = 5, ["5"] = 6, ["6"] = 7, ["7"] = 8, ["8"] = 9, ["9"] = 10, ["0"] = 11
-}
-
-local upperKeys =
-{
-
 }
 
 function fractalCore.keycode(char)
@@ -88,10 +83,6 @@ function fractalCore.tableLength(table)
     count = count + 1
   end
   return count
-end
-
-function fractalCore.stringLength(str)
-  return #str
 end
 
 initVals()

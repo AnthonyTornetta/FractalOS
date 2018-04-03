@@ -120,6 +120,10 @@ local setupButtons = function()
   end
 end
 
+local setupTaskbar = function()
+  winApi.setBox("task-bar", 0, h - 10, w, 10, 0x999999)
+end
+
 local init = function()
   w, h = gpu.getResolution()
   if not fs.isDirectory(fractalCore.getDir("desktop")) then
@@ -136,6 +140,7 @@ local init = function()
   refreshFileList()
 
   setupButtons()
+  setupTaskbar()
 
   drawBackground()
   winApi.drawAll()
