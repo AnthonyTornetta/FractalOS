@@ -19,7 +19,28 @@ function api.clearProgressBars()
   pBars = {}
 end
 
+function api.clearBoxes()
+  boxes = {}
+end
+
+function api.clearButton(id)
+  buttons[id] = nil
+end
+
+function api.clearTextBox(id)
+  textBoxes[id] = nil
+end
+
+function api.clearProgressBar(id)
+  pBars[id] = nil
+end
+
+function api.clearBox(id)
+  boxes[id] = nil
+end
+
 function api.clearAll()
+  api.clearBoxes()
   api.clearButtons()
   api.clearTextBoxes()
   api.clearProgressBars()
@@ -234,10 +255,12 @@ function api.drawTextBox(id)
 
   local drawX = x
   local drawY = y
+
   if api.getTextBoxAlignment(id) == "center" then
-    drawX = drawX + math.floor(w / 2) - (#txt / 2)
-    drawY = drawY + math.floor(h / 2)
+    drawX = x + math.floor(w / 2) - (#txt / 2)
+    drawY = y + math.floor(h / 2)
   end
+
   gpu.set(drawX, drawY, txt)
 
   gpu.setBackground(prevBG)
@@ -340,7 +363,7 @@ function api.drawAllProgressBars()
   end
 end
 
-function api.setBox(id, x, y, width, height, bgcol)
+function api.setBox(id, x, y, width, height, bgcol, borderColor)
   checkArg(2, x, "number")
   checkArg(3, y, "number")
   checkArg(2, width, "number")
@@ -351,6 +374,10 @@ function api.setBox(id, x, y, width, height, bgcol)
   boxes[id]["x"] = x
   boxes[id]["y"] = y
   boxes[id]["bgcol"] = bgcol
+  if not borderColor then
+    borderColor = bgcol
+  end
+  boxes[id]["bordercol"] = borderColor
   boxes[id]["width"]  = width
   boxes[id]["height"] = height
 end
@@ -365,6 +392,10 @@ end
 
 function api.getBoxColor(id)
   return boxes[id]["bgcol"]
+end
+
+function api.getBoxBorderColor(id)
+  return boxes[id]["bordercol"]
 end
 
 function api.setBoxPosition(id, x, y)
@@ -386,13 +417,23 @@ function api.setBoxColor(id, bgcol)
   boxes[id]["bgcol"] = bgcolor
 end
 
-function api.drawBox(id)
-  local bgCol = api.getBoxColor(id)
-  local prevBG = gpu.setBackground(bgCol)
+function api.setBoxBorderColor(id, col)
+  checkArg(2, col, "number")
+  boxes[id]["bordercol"] = col
+end
 
+function api.drawBox(id)
   local x, y = api.getBoxPosition(id)
   local w, h = api.getBoxDimensions(id)
+
+  local bgCol = api.getBoxColor(id)
+  local borderCol = api.getBoxBorderColor(id)
+
+  local prevBG = gpu.setBackground(borderCol)
   gpu.fill(x, y, w, h, " ")
+  
+  gpu.setBackground(bgCol)
+  gpu.fill(x + 1, y + 1, w - 1, h - 1, " ")
 
   gpu.setBackground(prevBG)
 end

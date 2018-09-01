@@ -1,5 +1,6 @@
 local fractalCore = require("fractalcore")
 local winApi = require("window-api");
+winApi.clearAll();
 
 local computer = require("computer")
 local comp = require("component")
@@ -18,6 +19,10 @@ w, h = gpu.getResolution()
 local files = {}
 local directories = {}
 
+-- All the button ids and such
+local taskBarBox = "task-bar-box"
+local btnGo = "go-btn"
+
 local refreshFileList = function()
   local temp, reason = fs.list(fractalCore.getDir("desktop"))
   if not temp then
@@ -35,18 +40,20 @@ end
 
 -- Event Handlers
 local mouseDown = function(x, y, mouseBtn, player)
-  local btnId = wApi.withinButtons(x, y)
-  print(btnId)
+  local btnId = winApi.withinButtons(x, y)
+
   if btnId ~= nil then
     if btnId == btnGo then
-      print("makeme")
+      msgBox("makeme")
+    elseif(btnId == "msg-box-ok") then
+      winApi.clearBox('msg-box')
+      winApi.clearButton("msg-box-ok")
+      winApi.clearTextBox("msg-box-message")
+      winApi.drawAll()
+      print("OK")
     else
-      if(fractalCore.tableLength(files) <= btnId) then
-        handleInterrupt()
-        local appThread = thread.create(
-        function()
-          os.execute(files[btnId])
-        end)
+      if(type(btnId) == "number" and fractalCore.tableLength(files) <= btnId) then
+        os.execute(fractalCore.getDir("desktop")..files[btnId])
       end
     end
   end
@@ -55,7 +62,8 @@ end
 local mouseUp = function(x, y, mouseBtn, player)
   touchX, touchY = -1, -1
 end
-local handleInterrupt = function()
+
+function handleInterrupt()
   running = false
 end
 
@@ -71,26 +79,27 @@ local eventListenerT = thread.create(function()
 
     -- TODO: Have this custom handeled by class requiring them
     local id, address, x, y, z, player = event.pullMultiple("interrupt", "key_down", "key_up", "touch", "drop", "clipboard", "scroll")
-    if     id == "interrupted" then
-      handleInterrupt()
-    elseif id == "key_down" then
-      fractalCore.setKeyDown(y, true)
-    elseif id == "key_up" then
-      fractalCore.setKeyDown(y, false)
-    elseif id == "touch" then
-      mouseDown(x, y, z, player)
-    elseif id == "drop" then
-      mouseUp(x, y, z, player)
+
+    local status, err = pcall(
+      function()
+        if     id == "interrupted" then
+          handleInterrupt()
+        elseif id == "key_down" then
+          fractalCore.setKeyDown(y, true)
+        elseif id == "key_up" then
+          fractalCore.setKeyDown(y, false)
+        elseif id == "touch" then
+          mouseDown(x, y, z, player)
+        elseif id == "drop" then
+          mouseUp(x, y, z, player)
+        end
+      end)
+
+    if not status then
+      print(err)
     end
   until false
 end)
-
-local drawBackground = function()
-  gpu.setForeground(0x000000)
-  gpu.setBackground(0xFFFFFF)
-
-  gpu.fill(1, 1, w, h, " ")
-end
 
 local setupButtons = function()
   local lastFileIndex = 0
@@ -113,7 +122,6 @@ local setupButtons = function()
     gpu.setForeground(0xFFFFFF)
     print(k)
     print(files[k])
-    os.sleep(4)
 
     if currentX + iconTotalWidth > w then
       currentX = iconPaddingX
@@ -140,9 +148,6 @@ local setupButtons = function()
   end
 end
 
-local taskBarBox = "task-bar-box"
-local btnGo = "go-btn"
-
 local setupTaskbar = function()
   winApi.setBox(taskBarBox, 1, h - 4, w, 5, 0x999999)
 
@@ -164,10 +169,10 @@ local init = function()
 
   refreshFileList()
 
+  winApi.setBox("background", 1, 1, w, h, 0xFFFFFF)
   setupButtons()
   setupTaskbar()
 
-  drawBackground()
   winApi.drawAll()
 
   while running do
@@ -185,6 +190,32 @@ end
 -- Util functions
 local err = function(msg)
   error(msg)
+end
+
+function msgBox(msg, ...)
+  local arg = {...}
+
+  local len = #arg;
+
+  w, h = gpu.getResolution()
+
+  local boxW = 20
+  local boxH = 6
+  local boxX = w / 2 - boxW / 2
+  local boxY = h / 2 - boxH
+
+  local btnW = 8
+  local btnH = 3
+
+  winApi.setBox("msg-box", boxX, boxY, boxW, boxH, 0xDDDDDD, 0xCCCCCC)
+  if(len == 0 or len == 1) then
+    local drawX = boxX + boxW / 2 - btnW / 2
+
+    winApi.setTextBox("msg-box-message", drawX, boxY + 1, btnW, 1, 0xDDDDDD, 0x000000, msg)
+    winApi.setButton("msg-box-ok", drawX, boxY + boxH - btnH - 1, btnW, btnH, 0xDDDDDD, 0x000000, "OK")
+  end
+
+  winApi.drawAll()
 end
 
 init()

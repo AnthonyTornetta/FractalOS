@@ -1,5 +1,7 @@
 local serialization = require("serialization")
 local wApi = require("window-api")
+wApi.clearAll()
+
 local comp = require("component")
 local thread = require("thread")
 local fs = require("filesystem")
