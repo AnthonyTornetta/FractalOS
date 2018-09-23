@@ -15,6 +15,8 @@ for address in comp.list('colorful_lamp') do
   table.insert(lamps, lamp)
 end
 
+wApi.clearAll()
+
 local running = true
 
 local btnPlayId = "btn-play"

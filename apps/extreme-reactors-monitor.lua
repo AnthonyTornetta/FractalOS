@@ -7,6 +7,11 @@ local thread = require("thread")
 local fs = require("filesystem")
 local event = require("event")
 
+if not comp.isAvailable("br_reactor")
+  print("No Extreme Reactors reactor found!")
+  os.exit()
+end
+
 local reactor = comp.br_reactor
 local gpu = comp.gpu
 

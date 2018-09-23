@@ -176,7 +176,6 @@ function api.withinButtons(x, y)
 end
 
 function api.setTextBox(id, x, y, width, height, bgcolor, fgcolor, text)
-  assert(id ~= nil, "text box id is nil")
   checkArg(2, x, "number")
   checkArg(3, y, "number")
   checkArg(4, width, "number")
@@ -214,13 +213,13 @@ function api.textBoxExists(id)
 end
 
 function api.setTextBoxDimensions(id, w, h)
-  checkArg(2, w, "number")
-  checkArg(3, h, "number")
   if w ~= nil then
+    checkArg(2, w, "number")
     textBoxes[id]["width"] = w
   end
   if h ~= nil then
     textBoxes[id]["height"] = h
+    checkArg(3, h, "number")
   end
 end
 
@@ -239,6 +238,18 @@ end
 
 function api.getTextBoxAlignment(id)
   return textBoxes[id]["alignment"]
+end
+
+function api.setTextBoxColors(id, bg, fg)
+  if bg ~= nil then
+    checkArg(2, bg, "number")
+    textBoxes[id]["bgcol"] = bg
+  end
+
+  if fg ~= nil then
+    checkArg(3, fg, "number")
+    textBoxes[id]["fgcol"] = fg
+  end
 end
 
 function api.drawTextBox(id)
@@ -316,10 +327,14 @@ function api.getProgressBarDimensions(id)
 end
 
 function api.setProgressBarColors(id, bg, fg)
-  checkArg(2, bg, "number")
-  checkArg(2, fg, "number")
-  pBars[id]["bgcol"] = bg
-  pBars[id]["fgcol"] = fg
+  if bg ~= nil then
+    checkArg(2, bg, "number")
+    pBars[id]["bgcol"] = bg
+  end
+  if fg ~= nil then
+    checkArg(3, fg, "number")
+    pBars[id]["fgcol"] = fg
+  end
 end
 
 function api.setProgressBarProgress(id, progress)
@@ -352,7 +367,7 @@ function api.drawProgressBar(id)
 
   gpu.fill(x + progress, y, w - progress, h, " ")
   gpu.setBackground(fgCol)
-  gpu.fill(x, y, progress, h, " ")
+  gpu.fill(x, y, w * progress, h, " ")
 
   gpu.setBackground(prevBG)
 end
@@ -431,7 +446,7 @@ function api.drawBox(id)
 
   local prevBG = gpu.setBackground(borderCol)
   gpu.fill(x, y, w, h, " ")
-  
+
   gpu.setBackground(bgCol)
   gpu.fill(x + 1, y + 1, w - 1, h - 1, " ")
 
@@ -458,5 +473,10 @@ function api.drawAll()
   api.drawAllButtons()
 end
 
+function api.cls()
+  gpu.setBackground(0x000000)
+  gpu.setForeground(0x000000)
+  gpu.fill(1, 1, w, h, " ")
+end
 
 return api

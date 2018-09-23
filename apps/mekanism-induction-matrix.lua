@@ -1,7 +1,8 @@
--- TODO: Make work w/ Fractal OS
-
-local computer = require("computer");
+local computer = require("computer")
 local comp = require("component")
+local win = require("window-api")
+local thread = require("thread")
+
 local gpu = comp.gpu
 
 if not comp.isAvailable("induction_matrix") then
@@ -9,103 +10,107 @@ if not comp.isAvailable("induction_matrix") then
   os.exit()
 end
 
+win.clearAll()
+
 local matrix = comp.induction_matrix
 
-oW, oH = gpu.getResolution() -- To set it back to the original settings after running
-gpu.setResolution(100, 40)
-w, h = gpu.getResolution()
+local running = true
+local w, h = gpu.getResolution()
 
-gpu.setBackground(0x000000)
-gpu.setForeground(0x000000)
-gpu.fill(1, 1, w, h, " ")
+local eventListenerT = thread.create(function()
+  repeat
+    local id, _, x, y = event.pullMultiple("touch", "interrupted")
+    if id == "interrupted" then
+      handleInterrupt()
+    end
+  until not running
+end)
 
-repeat
+function handleInterrupt()
+  running = false
+  os.exit()
+end
+
+function getBarColor(percentFilled)
+  if percentFilled < 10 then
+    return 0xFF0000
+  elseif percentFilled < 20 then
+    return 0xCC3300
+  elseif percentFilled < 30 then
+    return 0xAA4400
+  elseif percentFilled < 40 then
+    return 0x995500
+  elseif percentFilled < 50 then
+    return 0x886600
+  elseif percentFilled < 60 then
+    return 0x777700
+  elseif percentFilled < 70 then
+    return 0x668800
+  elseif percentFilled < 80 then
+    return 0x44AA00
+  elseif percentFilled < 90 then
+    return 0x33CC00
+  else
+    return 0x00FF00
+  end
+end
+
+local barPower = "percent-power"
+local txtPercentPower = "percent-power"
+local txtIO = "io"
+local txtStoredPower = "stored-power"
+
+local barHeight = math.ceil(h / 1.2)
+
+win.setProgressBar(barPower, 1, 1, w, barHeight, 0x333333, 0x000000)
+win.setTextBox("0%", 1, barHeight + 2, 2, 1, 0x000000, 0x00FF00, "0%")
+win.setTextBox("100%", w - 4, barHeight + 2, 4, 1, 0x000000, 0x00FF00, "100%")
+win.setTextBox(txtPercentPower, w / 2 - 2, barHeight + 2, 4, 1, 0x000000, 0x00FF00, "----")
+win.setTextBox(txtIO, 1, barHeight + 6, w, 1, 0x000000, 0x00FF00, "-")
+win.setTextBox(txtStoredPower, 1, barHeight + 3, w, 3, 0x000000, 0x00FF00, "x GJ / y GJ")
+
+while running do
   local maxPower = matrix.getMaxEnergy()
   local storedPower = matrix.getEnergy()
-  local powerHeight = h / 2
   local percentFilled = math.ceil((storedPower / maxPower) * 100)
-  local powerWidth = percentFilled * (w / 100) -- 100 because 100% is max
 
   local input = matrix.getInput()
   local output = matrix.getOutput()
-  local dif = input - output
 
-  -- Main power bar
-  gpu.setForeground(0x333333)
-  gpu.setBackground(0x333333)
-  gpu.fill(w - (w - (percentFilled + 1)), 0, w + 1, h / 3 + 1, " ")
+  win.setTextBoxText(txtPercentPower, percentFilled.."%")
+  win.setProgressBarColors(barPower, nil, getBarColor(percentFilled))
+  win.setProgressBarProgress(barPower, percentFilled)
 
-  gpu.setBackground(0x00FF00)
-  gpu.setForeground(0x00FF00)
-
-  if percentFilled < 10 then
-    gpu.setBackground(0xFF0000)
-    gpu.setForeground(0xFF0000)
-  elseif percentFilled < 20 then
-    gpu.setBackground(0xCC3300)
-    gpu.setForeground(0xCC3300)
-  elseif percentFilled < 30 then
-    gpu.setBackground(0xAA4400)
-    gpu.setForeground(0xAA4400)
-  elseif percentFilled < 40 then
-    gpu.setBackground(0x995500)
-    gpu.setBackground(0x995500)
-  elseif percentFilled < 50 then
-    gpu.setBackground(0x886600)
-    gpu.setForeground(0x886600)
-  elseif percentFilled < 60 then
-    gpu.setBackground(0x777700)
-    gpu.setForeground(0x777700)
-  elseif percentFilled < 70 then
-    gpu.setBackground(0x668800)
-    gpu.setForeground(0x668800)
-  elseif percentFilled < 80 then
-    gpu.setBackground(0x44AA00)
-    gpu.setForeground(0x44AA00)
-  elseif percentFilled < 90 then
-    gpu.setBackground(0x33CC00)
-    gpu.setForeground(0x33CC00)
+  local col
+  if output > input and percentFilled ~= 100 then
+    col = 0xFF0000
+  elseif input == output then
+    col = 0x3333FF
   else
-    gpu.setBackground(0x00FF00)
-    gpu.setForeground(0x00FF00)
+    col = 0x00FF00
   end
 
-  gpu.fill(1, 1, powerWidth, h / 3, " ")
+  win.setTextBoxColors(txtIO, nil, col)
 
-  gpu.setForeground(0x00FF00)
-  gpu.setBackground(0x000000)
-  gpu.set(1, h / 3 + 2, "0%")
-  gpu.set(w - 3, h / 3 + 2, "100%")
+  local decimals = 5
+  local roundDif = math.pow(10, decimals) -- 10 ^ how many decimals to show
+  local TO_GJ_CONVERSION = 1000000000 -- x units per GJ
+  local TPS = 20 -- x ticks per second
 
-  local str = percentFilled.."%"
+  local roundedStored = math.ceil(storedPower * roundDif / TO_GJ_CONVERSION) / roundDif
+  local roundedMax = math.ceil(maxPower * roundDif / TO_GJ_CONVERSION) / roundDif
 
-  if percentFilled < 100 then
-    str = " "..str
-  end
-  if percentFilled == 0 then
-    str = " "..str
-  end
+  local roundedInput = math.ceil(input * roundDif / TO_GJ_CONVERSION) / roundDif * TPS
+  local roundedOutput = math.ceil(output * roundDif / TO_GJ_CONVERSION) / roundDif * TPS
 
-  if percentFilled <= 10 and dif <= 0 then
+  win.setTextBoxText(txtStoredPower, string.format("%."..decimals.."f", roundedStored).." GJ / "..string.format("%."..decimals.."f", roundedMax).." GJ")
+  win.setTextBoxText(txtIO, "Input: "..string.format("%."..decimals.."f", roundedInput).." GJ/s | ".."Output: "..string.format("%."..decimals.."f", roundedOutput).." GJ/s")
+
+  if percentFilled <= 10 and input - output <= 0 then
     computer.beep(500)
   end
 
-  gpu.set(w / 2 - 2, h / 3 + 2, str)
+  win.drawAll()
 
-  if output > input and percentFilled ~= 100 then
-    gpu.setForeground(0xFF0000)
-  elseif input == output then
-    gpu.setForeground(0x3333FF)
-  else
-    gpu.setForeground(0x00FF00)
-  end
-
-
-  gpu.set(1, h/3 + 3, "                                                    ")
-  gpu.set(1, h/3 + 3, "Input: "..math.ceil(input).." | ".."Output: "..math.ceil(output))
-
-until false
-
-os.sleep(3)
-
-gpu.setResolution(oW, oH)
+  os.sleep(1)
+end
