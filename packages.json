@@ -21,6 +21,10 @@
         "Extreme Reactors":
         [
             { "file": "apps/extreme-reactors-monitor.lua", "saveto": "(apps)/extreme-reactors-monitor.lua" }
+        ],
+        "Shell Commands":
+        [
+            { "file": "shell cmd/github.lua", "saveto": "bin/github.lua" }
         ]
     }
 }
