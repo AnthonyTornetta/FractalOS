@@ -26,6 +26,10 @@ local printCentered = function(txt, height)
   end
 end
 
+local clearCentered = function(height)
+  printCentered("                                          ", height)
+end
+
 printCentered("Welcome to Fractal OS!", 2)
 printCentered("An open source OS for Open Computers!", 3)
 
@@ -80,22 +84,41 @@ local function err(ex) -- TODO: Make better
 end
 
 local function getFileFromURL(url, path)
+  printCentered("Downloading...", 12)
+
+  local printOut = url
+  for i = string.len(url), 1, -1 do
+    if string.sub(url, i, i) == "/" then
+      printOut = string.sub(url, i + 1, string.len(url))
+      break
+    end
+  end
+  
+  printCentered(printOut, 13)
+
   local success, response = internetRequest(url)
   if success then
     fs.makeDirectory(fs.path(path) or "/")
     local file = io.open(path, "w")
     file:write(response)
     file:close()
+
+    clearCentered(12)
+    clearCentered(13)
   else
     err("Could not connect to the url \""..url.."\"")
+
+    clearCentered(12)
+    clearCentered(13)
   end
 end
 
-printCentered("Installing...", line)
-local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/master/"
-printCentered("Installing Core Components...", 9)
+term.clear()
 
--- [ Installs core libraries needed for the installer to work ] --
+local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/master/"
+printCentered("Installing Core Components...", 5)
+
+-- [ Downloads core libraries needed for the installer to work ] --
 
 local _, tempStr = internetRequest(githubRoot.."core/fractalcore.lua")
 local fractalcore = load(tempStr)()
@@ -106,20 +129,18 @@ local json = load(tempStr)()
 _, tempStr = internetRequest(githubRoot.."packages.json")
 local temp = json.decode(tempStr)
 
-term.clear()
-
 local function getDir(str)
   local dir = ""
 
   local parenOpenAt = -1
 
-  for i = 1, string.len(v["saveto"]) do
-    local c = string.sub(v["saveto"], i, i)
+  for i = 1, string.len(str) do
+    local c = string.sub(str, i, i)
 
     if c == "(" and parenOpenAt == -1 then
       parenOpenAt = i
     elseif c == ")" then
-      dir = string.sub(v["saveto"], parenOpenAt + 1, i - 1)
+      dir = string.sub(str, parenOpenAt + 1, i - 1)
       break
     end
   end
@@ -133,18 +154,38 @@ local function getDir(str)
   return dir
 end
 
-for _, v in pairs(temp["files"]["core"]) do
+-- [ Installs core libraries for the OS to work ] --
+
+for k, v in pairs(temp["files"]["core"]) do
   getFileFromURL(githubRoot..v["file"], getDir(v["saveto"]) .. "/" .. string.sub(v["saveto"], string.find(v["saveto"], ")") + 1))
 end
 
--- [ Installs non-manditory packages ] (todo) --
--- for _, v in pairs(temp["files"]) do
---   getFileFromURL(githubRoot..v["file"], dir .. "/" .. string.sub(getDir(v["saveto"]), string.find(v["saveto"], ")") + 1))
--- end
+printCentered("Installing additional packages", 3)
 
-printCentered("                                              ", 9)
-printCentered("Done!...", 9)
-os.sleep(10)
+-- [ Installs non-manditory packages ] (todo) --
+for k, v in pairs(temp["files"]) do
+  if k ~= "core" then
+    clearCentered(5)
+    printCentered("Install ".. k .."? y/n", 5)
+
+    local ch = ''
+
+    repeat -- Wait until they type a valid key...
+      _, _, _, ch = event.pull('key_down')
+    until ch == 21 or ch == 49 -- y = 21; n = 49
+
+    if ch == 21 then
+      for _, f in ipairs(temp["files"][k]) do
+        getFileFromURL(githubRoot..f["file"], getDir(f["saveto"]) .. "/" .. string.sub(f["saveto"], string.find(f["saveto"], ")") + 1))
+      end
+    end
+  end
+end
+
+clearCentered(9)
+term.clear()
+printCentered("Fractal OS Installation Complete!" , 3)
+os.sleep(2)
 gpu.setResolution(oW, oH)
 gpu.setForeground(0xFFFFFF)
 gpu.setBackground(0x000000)
