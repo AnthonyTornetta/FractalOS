@@ -48,12 +48,12 @@ end
 
 function api.setButton(id, x, y, width, height, bgcolor, fgcolor, text)
   checkArg(2, x, "number")
-  checkArg(2, y, "number")
-  checkArg(2, width, "number")
-  checkArg(2, height, "number")
-  checkArg(2, bgcolor, "number")
-  checkArg(2, fgcolor, "number")
-  checkArg(2, text, "string")
+  checkArg(3, y, "number")
+  checkArg(4, width, "number")
+  checkArg(5, height, "number")
+  checkArg(6, bgcolor, "number")
+  checkArg(7, fgcolor, "number")
+  checkArg(8, text, "string")
 
   buttons[id] = {}
   buttons[id]["x"] = x

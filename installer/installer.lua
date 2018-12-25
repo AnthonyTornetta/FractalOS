@@ -94,28 +94,22 @@ end
 printCentered("Installing...", line)
 local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/master/"
 printCentered("Installing Core Components...", 9)
+
+-- [ Installs core libraries needed for the installer to work ] --
+getFileFromURL(githubRoot.."libs/json-api.lua", "/lib/json-api.lua")
 getFileFromURL(githubRoot.."core/fractalcore.lua", "/lib/fractalcore.lua")
-getFileFromURL(githubRoot.."libs/window-api.lua", "/lib/window-api.lua")
-getFileFromURL(githubRoot.."libs/web-api.lua", "/lib/web-api.lua")
 
 os.sleep(1)
 local fractalCore = require("fractalcore")
 
-fs.makeDirectory(fractalCore.getDir("root"))
-fs.makeDirectory(fractalCore.getDir("core"))
-fs.makeDirectory(fractalCore.getDir("apps"))
-fs.makeDirectory(fractalCore.getDir("localapps"))
-fs.makeDirectory(fractalCore.getDir("desktop"))
-fs.makeDirectory(fractalCore.getDir("lib"))
-fs.makeDirectory(fractalCore.getDir("user"))
+local temp = json.decode(internetRequest(githubRoot.."packages.json"))
 
-getFileFromURL(githubRoot.."core/desktop.lua", fractalCore.getDir("core").."desktop.lua")
-getFileFromURL(githubRoot.."core/boot.lua", fractalCore.getDir("root").."boot.lua")
-
-printCentered("Installing Additional Components...", 9)
-if comp.isAvailable("tape_drive") then
-  getFileFromURL(githubRoot.."apps/jukebox.lua", fractalCore.getDir("apps").."jukebox.lua")
+for k, v in pairs(temp) do
+  print(k, v)
 end
+
+-- printCentered("Installing Additional Components...", 9)
+
 
 printCentered("                                              ", 9)
 printCentered("Done!...", 9)

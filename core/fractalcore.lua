@@ -47,7 +47,6 @@ function fractalCore.shutdown()
   computer.shutdown(false) -- Shutdown, not restart
 end
 
-
 local function initVals()
   dirs["root"]      = "/fractal/"
   dirs["lib"]       = "/lib/"
@@ -56,6 +55,10 @@ local function initVals()
   dirs["apps"]      = fractalCore.getDir("root").."apps/"
   dirs["localapps"] = fractalCore.getDir("user").."apps/"
   dirs["desktop"]   = fractalCore.getDir("user").."desktop/"
+
+  for k, v in pairs(dirs) do
+    fs.makeDirectory(v)
+  end
 end
 
 -- File Utils
