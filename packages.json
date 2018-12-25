@@ -6,6 +6,7 @@
             { "file": "core/fractalcore.lua", "saveto": "(lib)/fractalcore.lua" },
             { "file": "libs/window-api.lua", "saveto": "(lib)/window-api.lua" },
             { "file": "libs/web-api.lua", "saveto": "(lib)/web-api.lua" },
+            { "file": "libs/yml-api.lua", "saveto": "(lib)/yml-api.lua" },
             { "file": "core/desktop.lua", "saveto": "(core)/desktop.lua" },
             { "file": "core/boot.lua", "saveto": "(core)/boot.lua" }
         ],
