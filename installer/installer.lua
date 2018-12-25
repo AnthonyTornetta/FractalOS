@@ -101,7 +101,7 @@ getFileFromURL(githubRoot.."core/fractalcore.lua", "/lib/fractalcore.lua")
 
 os.sleep(1)
 local fractalCore = require("fractalcore")
-
+local json = require("json-api")
 local temp = json.decode(internetRequest(githubRoot.."packages.json"))
 
 for k, v in pairs(temp) do
