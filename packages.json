@@ -1,1 +1,17 @@
-{"dirsKey":"directories.yml","files":[{"core":[{"file":"core/fractalcore.lua","saveto":"(lib)/fractalcore.lua"},{"file":"libs/window-api.lua","saveto":"(lib)/window-api.lua"},{"file":"libs/web-api.lua","saveto":"(lib)/web-api.lua"},{"file":"core/desktop.lua","saveto":"(core)/desktop.lua"},{"file":"core/boot.lua","saveto":"(core)/boot.lua"}],"Computronics":[{"file":"apps/jukebox.lua","saveto":"(apps)/jukebox.lua"}]}]}
+{
+    "files":
+    {
+        "core": 
+        [
+            { "file": "core/fractalcore.lua", "saveto": "(lib)/fractalcore.lua" },
+            { "file": "libs/window-api.lua", "saveto": "(lib)/window-api.lua" },
+            { "file": "libs/web-api.lua", "saveto": "(lib)/web-api.lua" },
+            { "file": "core/desktop.lua", "saveto": "(core)/desktop.lua" },
+            { "file": "core/boot.lua", "saveto": "(core)/boot.lua" }
+        ],
+        "Computronics":
+        [
+            { "file": "apps/jukebox.lua", "saveto": "(apps)/jukebox.lua" }
+        ]
+    }
+}

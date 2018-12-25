@@ -96,24 +96,55 @@ local githubRoot = "https://raw.githubusercontent.com/Cornchipss/FractalOS/maste
 printCentered("Installing Core Components...", 9)
 
 -- [ Installs core libraries needed for the installer to work ] --
-getFileFromURL(githubRoot.."libs/json-api.lua", "/lib/json-api.lua")
-getFileFromURL(githubRoot.."core/fractalcore.lua", "/lib/fractalcore.lua")
 
-os.sleep(1)
-local fractalCore = require("fractalcore")
-local json = require("json-api")
-local temp = json.decode(internetRequest(githubRoot.."packages.json"))
+local _, tempStr = internetRequest(githubRoot.."core/fractalcore.lua")
+local fractalcore = load(tempStr)()
 
-for k, v in pairs(temp) do
-  print(k, v)
+_, tempStr = internetRequest(githubRoot.."libs/json-api.lua")
+local json = load(tempStr)()
+
+_, tempStr = internetRequest(githubRoot.."packages.json")
+local temp = json.decode(tempStr)
+
+term.clear()
+
+local function getDir(str)
+  local dir = ""
+
+  local parenOpenAt = -1
+
+  for i = 1, string.len(v["saveto"]) do
+    local c = string.sub(v["saveto"], i, i)
+
+    if c == "(" and parenOpenAt == -1 then
+      parenOpenAt = i
+    elseif c == ")" then
+      dir = string.sub(v["saveto"], parenOpenAt + 1, i - 1)
+      break
+    end
+  end
+
+  if dir ~= "" then
+    dir = fractalcore.getDir(dir)
+  else
+    dir = "/" 
+  end
+
+  return dir
 end
 
--- printCentered("Installing Additional Components...", 9)
+for _, v in pairs(temp["files"]["core"]) do
+  getFileFromURL(githubRoot..v["file"], getDir(v["saveto"]) .. "/" .. string.sub(v["saveto"], string.find(v["saveto"], ")") + 1))
+end
 
+-- [ Installs non-manditory packages ] (todo) --
+-- for _, v in pairs(temp["files"]) do
+--   getFileFromURL(githubRoot..v["file"], dir .. "/" .. string.sub(getDir(v["saveto"]), string.find(v["saveto"], ")") + 1))
+-- end
 
 printCentered("                                              ", 9)
 printCentered("Done!...", 9)
-os.sleep(2)
+os.sleep(10)
 gpu.setResolution(oW, oH)
 gpu.setForeground(0xFFFFFF)
 gpu.setBackground(0x000000)
