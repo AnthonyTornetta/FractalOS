@@ -12,6 +12,14 @@
         "Computronics":
         [
             { "file": "apps/jukebox.lua", "saveto": "(apps)/jukebox.lua" }
+        ],
+        "Mekanism":
+        [
+            { "file": "apps/mekanism-induction-matrix.lua", "saveto": "(apps)/mekanism-induction-matrix.lua" }
+        ],
+        "Extreme Reactors":
+        [
+            { "file": "apps/extreme-reactors-monitor.lua", "saveto": "(apps)/extreme-reactors-monitor.lua" }
         ]
     }
 }

@@ -4,7 +4,7 @@ local event = require("event")
 local term = require("term")
 
 local internet = comp.internet
-local gpu = comp.gpu;
+local gpu = comp.gpu
 
 local line = 1
 

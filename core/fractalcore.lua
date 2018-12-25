@@ -50,6 +50,7 @@ end
 local function initVals()
   dirs["root"]      = "/fractal/"
   dirs["lib"]       = "/lib/"
+  dirs["libs"]      = "/lib/"
   dirs["core"]      = fractalCore.getDir("root").."core/"
   dirs["user"]      = fractalCore.getDir("root").."user/"
   dirs["apps"]      = fractalCore.getDir("root").."apps/"
