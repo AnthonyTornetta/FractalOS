@@ -1,7 +1,0 @@
-"root"="fractal/"
-"lib"="lib/"
-"core="(root)/core/"
-"user="(root)/user/"
-"apps="(root)/apps/"
-"localapps"="(user)/apps/"
-"desktop"="(user)/desktop/"
