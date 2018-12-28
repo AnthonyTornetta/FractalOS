@@ -7,7 +7,7 @@ local thread = require("thread")
 local fs = require("filesystem")
 local event = require("event")
 
-if not comp.isAvailable("br_reactor")
+if not comp.isAvailable("br_reactor") then
   print("No Extreme Reactors reactor found!")
   os.exit()
 end
