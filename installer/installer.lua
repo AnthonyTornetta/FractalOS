@@ -161,6 +161,7 @@ function resolvePathAfterParen(saveto)
     return saveto
   else
     return string.sub(saveto, index + 1)
+  end
 end
 
 -- [ Installs core libraries for the OS to work ] --
