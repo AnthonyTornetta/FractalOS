@@ -154,10 +154,19 @@ local function getDir(str)
   return dir
 end
 
+function resolvePathAfterParen(saveto)
+  local index = string.find(saveto, ")")
+  
+  if index == nil then
+    return saveto
+  else
+    return string.sub(saveto, index + 1)
+end
+
 -- [ Installs core libraries for the OS to work ] --
 
 for k, v in pairs(temp["files"]["core"]) do
-  getFileFromURL(githubRoot..v["file"], getDir(v["saveto"]) .. "/" .. string.sub(v["saveto"], string.find(v["saveto"], ")") + 1))
+  getFileFromURL(githubRoot..v["file"], getDir(v["saveto"]) .. "/" .. resolvePathAfterParen(v["saveto"]))
 end
 
 printCentered("Installing additional packages", 3)
@@ -176,7 +185,7 @@ for k, v in pairs(temp["files"]) do
 
     if ch == 21 then
       for _, f in ipairs(temp["files"][k]) do
-        getFileFromURL(githubRoot..f["file"], getDir(f["saveto"]) .. "/" .. string.sub(f["saveto"], string.find(f["saveto"], ")") + 1))
+        getFileFromURL(githubRoot..f["file"], getDir(f["saveto"]) .. "/" .. resolvePathAfterParen(f["saveto"]))
       end
     end
   end
