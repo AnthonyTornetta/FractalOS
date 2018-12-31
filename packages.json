@@ -24,7 +24,7 @@
         ],
         "Shell Commands":
         [
-            { "file": "shell cmd/github.lua", "saveto": "bin/github.lua" }
+            { "file": "shell cmds/github.lua", "saveto": "bin/github.lua" }
         ]
     }
 }
