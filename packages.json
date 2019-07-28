@@ -1,7 +1,7 @@
 {
     "files":
     {
-        "core": 
+        "core":
         [
             { "file": "core/fractalcore.lua", "saveto": "(lib)/fractalcore.lua" },
             { "file": "libs/window-api.lua", "saveto": "(lib)/window-api.lua" },
@@ -21,6 +21,10 @@
         "Extreme Reactors":
         [
             { "file": "apps/extreme-reactors-monitor.lua", "saveto": "(apps)/extreme-reactors-monitor.lua" }
+        ],
+        "Nuclearcraft":
+        [
+            { "file": "apps/fusion-reactor-nc.lua", "saveto": "(apps)/fusion-reactor-nc.lua" }
         ],
         "Shell Commands":
         [

@@ -40,7 +40,6 @@ local txtMaxID = "txt-max"
 local reactorState = "automatic" -- automatic, on, off
 local reactorStatus = "OFF"
 
-
 if not reactor.getMultiblockAssembled() then
   print("The reactor must be assembled correctly!")
   return 1

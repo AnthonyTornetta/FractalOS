@@ -17,6 +17,10 @@ local matrix = comp.induction_matrix
 local running = true
 local w, h = gpu.getResolution()
 
+gpu.setForeground(0x000000)
+gpu.setBackground(0x000000)
+gpu.fill(1, 1, w, h)
+
 local eventListenerT = thread.create(function()
   repeat
     local id, _, x, y = event.pullMultiple("touch", "interrupted")
@@ -32,27 +36,7 @@ function handleInterrupt()
 end
 
 function getBarColor(percentFilled)
-  if percentFilled < 10 then
-    return 0xFF0000
-  elseif percentFilled < 20 then
-    return 0xCC3300
-  elseif percentFilled < 30 then
-    return 0xAA4400
-  elseif percentFilled < 40 then
-    return 0x995500
-  elseif percentFilled < 50 then
-    return 0x886600
-  elseif percentFilled < 60 then
-    return 0x777700
-  elseif percentFilled < 70 then
-    return 0x668800
-  elseif percentFilled < 80 then
-    return 0x44AA00
-  elseif percentFilled < 90 then
-    return 0x33CC00
-  else
-    return 0x00FF00
-  end
+  return (math.floor(255 * (1 - percentFilled)) << 16) + (math.floor(255 * percentFilled) << 8)
 end
 
 local barPower = "percent-power"
